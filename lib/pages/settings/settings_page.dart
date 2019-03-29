@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/pages/base/base_page.dart';
 import 'package:flutter_flow_list/ui/common_switch.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
-import 'package:flutter_flow_list/util/uidata.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends BasePage {
@@ -31,7 +31,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
   }
 
   void _onAccountClicked() {
-    Navigator.pushNamed(context, UIData.settingsLoginRoute);
+    Navigator.pushNamed(context, Constants.settingsLoginRoute);
   }
 
   void _onDarkThemeClicked(bool enabled) {

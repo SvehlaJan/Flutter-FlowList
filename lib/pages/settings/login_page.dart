@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -62,8 +63,7 @@ class _LoginPageState extends State<LoginPage> {
       FirebaseUser newFirebaseUser = await _firebaseAuth.currentUser();
       assert(user.uid == newFirebaseUser.uid);
 
-      _onUserLoaded(newFirebaseUser);
-      _onSuccess();
+      _onSuccess(newFirebaseUser);
     } on PlatformException catch (e) {
       setState(() {
         _authHint = e.message;
@@ -83,36 +83,11 @@ class _LoginPageState extends State<LoginPage> {
       FirebaseUser newFirebaseUser = await _firebaseAuth.currentUser();
       assert(user.uid == newFirebaseUser.uid);
 
-      _onUserLoaded(newFirebaseUser);
-      _onSuccess();
+      _onSuccess(newFirebaseUser);
     } on PlatformException catch (e) {
       setState(() {
         _authHint = e.message;
       });
-    }
-  }
-
-  void _onUserLoaded(FirebaseUser firebaseUser) async {
-    await Preferences.load();
-    final QuerySnapshot result =
-        await Firestore.instance.collection('users').where('id', isEqualTo: firebaseUser.uid).getDocuments();
-    final List<DocumentSnapshot> documents = result.documents;
-    if (documents.length == 0) {
-      // Update data to server if new user
-      Firestore.instance
-          .collection('users')
-          .document(firebaseUser.uid)
-          .setData({'nickname': firebaseUser.displayName, 'photoUrl': firebaseUser.photoUrl, 'id': firebaseUser.uid});
-
-      Preferences.setString(Preferences.KEY_USER_UID, firebaseUser.uid);
-      Preferences.setString(Preferences.KEY_USER_NICK_NAME, firebaseUser.displayName);
-      Preferences.setString(Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
-    } else {
-      // Write data to local
-      Preferences.setString(Preferences.KEY_USER_UID, documents[0]['id']);
-      Preferences.setString(Preferences.KEY_USER_NICK_NAME, documents[0]['nickname']);
-      Preferences.setString(Preferences.KEY_USER_PHOTO_URL, documents[0]['photoUrl']);
-//        Preferences.setString('aboutMe', documents[0]['aboutMe']);
     }
   }
 
@@ -135,7 +110,52 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _onSuccess() {
+  void _onSuccess(FirebaseUser firebaseUser) async {
+    Firestore.instance
+        .collection(Constants.FIRESTORE_USERS)
+        .document(firebaseUser.uid)
+        .setData({
+      Constants.FIRESTORE_ID: firebaseUser.uid,
+      Constants.FIRESTORE_PROVIDER_ID: firebaseUser.providerId,
+      Constants.FIRESTORE_NICKNAME: firebaseUser.displayName,
+      Constants.FIRESTORE_EMAIL: firebaseUser.email,
+      Constants.FIRESTORE_PHOTO_URL: firebaseUser.photoUrl,
+    });
+
+    await Preferences.load();
+    Preferences.setString(Preferences.KEY_USER_UID, firebaseUser.uid);
+    Preferences.setString(Preferences.KEY_USER_EMAIL, firebaseUser.email);
+    Preferences.setString(
+        Preferences.KEY_USER_NICK_NAME, firebaseUser.displayName);
+    Preferences.setString(
+        Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
+
+
+//    final QuerySnapshot result = await Firestore.instance
+//        .collection(Constants.FIRESTORE_USERS)
+//        .where(Constants.FIRESTORE_ID, isEqualTo: firebaseUser.uid)
+//        .getDocuments();
+//    final List<DocumentSnapshot> documents = result.documents;
+//    if (documents.length == 0) {
+//      // Update data to server if new user
+//      Preferences.setString(Preferences.KEY_USER_UID, firebaseUser.uid);
+//      Preferences.setString(Preferences.KEY_USER_EMAIL, firebaseUser.email);
+//      Preferences.setString(
+//          Preferences.KEY_USER_NICK_NAME, firebaseUser.displayName);
+//      Preferences.setString(
+//          Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
+//    } else {
+//      // Write data to local
+//      Preferences.setString(
+//          Preferences.KEY_USER_UID, documents[0][Constants.FIRESTORE_ID]);
+//      Preferences.setString(
+//          Preferences.KEY_USER_EMAIL, documents[0][Constants.FIRESTORE_EMAIL]);
+//      Preferences.setString(Preferences.KEY_USER_NICK_NAME,
+//          documents[0][Constants.FIRESTORE_NICKNAME]);
+//      Preferences.setString(Preferences.KEY_USER_PHOTO_URL,
+//          documents[0][Constants.FIRESTORE_PHOTO_URL]);
+//    }
+
     Navigator.of(context).pop(true);
   }
 

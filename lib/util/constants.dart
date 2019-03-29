@@ -5,7 +5,17 @@ import 'package:flutter/material.dart';
 
 enum AppTheme { light, dark }
 
-class UIData {
+class Constants {
+  static const String FIRESTORE_USERS = "users";
+  static const String FIRESTORE_FLOW_NOTES = "flow_notes";
+  
+  static const String FIRESTORE_ID = "id";
+  static const String FIRESTORE_PROVIDER_ID = "provider_id";
+  static const String FIRESTORE_NICKNAME = "nickname";
+  static const String FIRESTORE_EMAIL = "email";
+  static const String FIRESTORE_PHOTO_URL = "photo_url";
+
+
   //routes
 //  static const String homeRoute = "/";
   static const String loginRoute = "login";

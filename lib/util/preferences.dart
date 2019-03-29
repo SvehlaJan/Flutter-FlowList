@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Preferences {
   static const String KEY_USER_UID = "user_uid";
   static const String KEY_USER_NICK_NAME = "user_nick_name";
+  static const String KEY_USER_EMAIL = "user_email";
   static const String KEY_USER_PHOTO_URL = "user_photo_url";
   static const String KEY_SETTINGS_THEME = "settings_theme";
 

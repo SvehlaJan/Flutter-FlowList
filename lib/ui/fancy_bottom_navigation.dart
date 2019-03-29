@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/main.dart';
-import 'package:flutter_flow_list/util/uidata.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 import 'fancy_tab_item.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
@@ -34,13 +34,13 @@ class TabHelper {
   static String initialRoute(TabItem tabItem) {
     switch (tabItem) {
       case TabItem.list:
-        return UIData.koprRoute;
+        return Constants.koprRoute;
       case TabItem.chat:
-        return UIData.chatRoute;
+        return Constants.chatRoute;
       case TabItem.settings:
-        return UIData.settingsRoute;
+        return Constants.settingsRoute;
     }
-    return UIData.notFoundRoute;
+    return Constants.notFoundRoute;
   }
 
   static IconData icon(TabItem tabItem) {

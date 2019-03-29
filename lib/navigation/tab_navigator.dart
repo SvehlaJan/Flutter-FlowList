@@ -6,7 +6,7 @@ import 'package:flutter_flow_list/pages/kopr/kopr_list_page.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';
 import 'package:flutter_flow_list/pages/settings/settings_page.dart';
 import 'package:flutter_flow_list/ui/fancy_bottom_navigation.dart';
-import 'package:flutter_flow_list/util/uidata.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 
 class TabNavigator extends StatelessWidget {
   TabNavigator({this.navigatorKey, this.tabItem, this.rootContext});
@@ -15,52 +15,51 @@ class TabNavigator extends StatelessWidget {
   final TabItem tabItem;
   final BuildContext rootContext;
 
-  void _push(BuildContext context) {
-    var routeBuilders = _routeBuilders(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => routeBuilders[UIData.detailRoute](context),
-      ),
-    );
-  }
+  Route<dynamic> _getRoute(RouteSettings settings) {
+    Map<String, String> arguments;
+    if (settings.arguments is Map<String, Object>) {
+      arguments = settings.arguments;
+    }
 
-  Map<String, WidgetBuilder> _routeBuilders(BuildContext context) {
-    return {
-//      UIData.homeRoute: (context) => ColorsListPage(
-//            color: TabHelper.color(tabItem, context),
-//            title: TabHelper.description(tabItem),
-//            onPush: (materialIndex) =>
-//                _push(context, materialIndex: materialIndex),
-//          ),
-//      UIData.detailRoute: (context) => ColorDetailPage(
-//            color: TabHelper.color(tabItem, context),
-//            title: TabHelper.description(tabItem),
-//            materialIndex: materialIndex,
-//            rootContext: rootContext, //added
-//          ),
-//      UIData.homeRoute: (context) => NotFoundPage(),
-      UIData.loginRoute: (context) => LoginPage(),
-      UIData.chatRoute: (context) => ChatPage(),
-      UIData.koprRoute: (context) => KoprListPage(),
-      UIData.koprAddRoute: (context) => KoprAddNotePage(),
-      UIData.settingsRoute: (context) => SettingsPage(),
-      UIData.settingsLoginRoute: (context) => LoginPage(),
-    };
+    switch (settings.name) {
+      case Constants.loginRoute:
+        return MaterialPageRoute<void>(
+            settings: settings, builder: (BuildContext context) => LoginPage());
+      case Constants.chatRoute:
+        return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (BuildContext context) => NotFoundPage());
+      case Constants.koprRoute:
+        return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (BuildContext context) => KoprListPage());
+      case Constants.koprAddRoute:
+        String date;
+        if (arguments != null && arguments.containsKey(KoprAddNotePage.ARG_DATE)) {
+          date = arguments[KoprAddNotePage.ARG_DATE];
+        }
+        return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (BuildContext context) => KoprAddNotePage(initDateString: date));
+      case Constants.settingsRoute:
+        return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (BuildContext context) => SettingsPage());
+      case Constants.settingsLoginRoute:
+        return MaterialPageRoute<void>(
+            settings: settings, builder: (BuildContext context) => LoginPage());
+    }
+
+    // The other paths we support are in the routes table.
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    var routeBuilders = _routeBuilders(context);
-
     return Navigator(
       key: navigatorKey,
       initialRoute: TabHelper.initialRoute(tabItem),
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(
-          builder: (context) => routeBuilders[routeSettings.name](context),
-        );
-      },
+      onGenerateRoute: _getRoute,
       onUnknownRoute: (routeSettings) {
         return MaterialPageRoute(builder: (context) => NotFoundPage());
       },

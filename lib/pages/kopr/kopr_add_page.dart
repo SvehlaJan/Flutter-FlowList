@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
-import 'package:firebase_database/firebase_database.dart';
+
+//import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:flutter_flow_list/entities/flow_record_entity.dart';
 import 'package:flutter_flow_list/pages/base/firebase_database_page.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 
 class KoprAddNotePage extends FirebasePoweredPage {
+  static const String ARG_DATE = "date";
+
   final String initDateString;
 
   KoprAddNotePage({this.initDateString});
@@ -18,12 +23,8 @@ class KoprAddNotePage extends FirebasePoweredPage {
 
 class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
     with TickerProviderStateMixin {
-  DatabaseError _error;
-
   DateTime _selectedDate;
-  DatabaseReference _recordsRef;
-  DatabaseReference _selectedRecordRef;
-  StreamSubscription<Event> _selectedRecordSubscription;
+  DocumentReference _firestoreRef;
 
   AnimationController _controller;
   TextEditingController _entry1ValueController;
@@ -31,6 +32,7 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
   TextEditingController _entry3ValueController;
 
   bool _isEditMode = false;
+  String _userId;
 
   static const int kStartValue = 2;
 
@@ -53,26 +55,8 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _selectedRecordSubscription.cancel();
-  }
-
-  @override
   void initFirebaseReferences(String userId) {
-    // Demonstrates configuring the database directly
-//    final FirebaseDatabase database = new FirebaseDatabase();
-    // Demonstrates configuring to the database using a file
-    final FirebaseDatabase database = FirebaseDatabase.instance;
-    database.setPersistenceEnabled(true);
-    database.setPersistenceCacheSizeBytes(10000000);
-
-    _recordsRef = database
-        .reference()
-        .child('kopr')
-        .child('flow_notes')
-        .child(userId)
-        .child('records');
+    _userId = userId;
 
     if (widget.initDateString != null) {
       _setSelectedDate(DateTime.parse(widget.initDateString));
@@ -81,24 +65,21 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
     }
   }
 
-  void _initRecordForDateTime(DateTime dateTime) {
+  void _initRecordForDateTime(DateTime dateTime) async {
     String date = formatDate(dateTime, [yyyy, '-', mm, '-', dd]);
 
-    if (_selectedRecordSubscription != null) {
-      _selectedRecordSubscription.cancel();
-    }
+    _firestoreRef = Firestore.instance
+        .collection(Constants.FIRESTORE_USERS)
+        .document(_userId)
+        .collection(Constants.FIRESTORE_FLOW_NOTES)
+        .document(date);
 
-    _selectedRecordRef = _recordsRef.child(date);
-
-    _selectedRecordRef.once().then((DataSnapshot snapshot) {
-      if (snapshot.value != null) {
+    _firestoreRef.get().then((DocumentSnapshot snapshot) {
+      if (snapshot != null && snapshot.data != null) {
         _isEditMode = true;
-        _entry1ValueController.text =
-            snapshot.value[FlowRecord.KEY_ENTRY_1] ?? "";
-        _entry2ValueController.text =
-            snapshot.value[FlowRecord.KEY_ENTRY_2] ?? "";
-        _entry3ValueController.text =
-            snapshot.value[FlowRecord.KEY_ENTRY_3] ?? "";
+        _entry1ValueController.text = snapshot[FlowRecord.KEY_ENTRY_1] ?? "";
+        _entry2ValueController.text = snapshot[FlowRecord.KEY_ENTRY_2] ?? "";
+        _entry3ValueController.text = snapshot[FlowRecord.KEY_ENTRY_3] ?? "";
       } else {
         _isEditMode = false;
         _entry1ValueController.text = "Sample text a";
@@ -106,19 +87,8 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
         _entry3ValueController.text = "";
       }
       showContent(force: true);
-    });
-    _selectedRecordSubscription =
-        _selectedRecordRef.onChildChanged.listen((Event event) {
-      print('Child changed: ${event.snapshot.key ?? "null"}');
-      setState(() {
-        _error = null;
-        _controller.forward(from: 0.0);
-      });
     }, onError: (Object o) {
-      final DatabaseError error = o;
-      setState(() {
-        _error = error;
-      });
+      print(o);
     });
   }
 
@@ -127,15 +97,19 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
     _selectedDate = dateTime;
   }
 
-  Future<Null> _onFabClicked() async {
-    await _selectedRecordRef.update(<String, String>{
-      FlowRecord.KEY_ENTRY_1: _entry1ValueController.text,
-      FlowRecord.KEY_ENTRY_2: _entry2ValueController.text,
-      FlowRecord.KEY_ENTRY_3: _entry3ValueController.text,
-      FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String()
+  void _onFabClicked() {
+    Firestore.instance.runTransaction((transaction) async {
+      await transaction.set(
+        _firestoreRef,
+        {
+          FlowRecord.KEY_ENTRY_1: _entry1ValueController.text,
+          FlowRecord.KEY_ENTRY_2: _entry2ValueController.text,
+          FlowRecord.KEY_ENTRY_3: _entry3ValueController.text,
+          FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String(),
+        },
+      );
+      Navigator.of(context).pop(true);
     });
-
-    Navigator.of(context).pop(true);
   }
 
   void _onDateClicked() {
@@ -162,18 +136,18 @@ class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
             content: Text("Are you sure to delete this record?"),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Delete'),
+                child: new Text('Cancel'),
                 onPressed: () {
-                  _recordsRef.remove().then((_) {
-                    Navigator.of(context).pop();
-                  });
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Delete'),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  _firestoreRef.delete().then((_) {
+                    Navigator.of(context).pop();
+                  });
+                  Navigator.of(context).pop(); // close dialog
                 },
               ),
             ],

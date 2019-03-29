@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/app.dart';
 import 'package:flutter_flow_list/pages/base/notfound_page.dart';
-import 'package:flutter_flow_list/util/uidata.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 
 void main() => runApp(MyApp());
 

@@ -20,24 +20,24 @@ dependencies:
   flutter:
     sdk: flutter
 
-  kt_dart: ^0.5.0
+#  kt_dart: ^0.5.0
   cupertino_icons: ^0.1.2
 
   flutter_crashlytics: ^0.2.1+1
   flutter_local_notifications: ^0.5.2
 
   firebase_analytics: ^2.0.3
-  firebase_database: ^2.0.2
+#  firebase_database: ^2.0.2
   firebase_auth: ^0.8.2
   firebase_storage: 2.1.0+1
   cloud_firestore: 0.9.7
 
-  google_api_availability: ^2.0.0
+#  google_api_availability: ^2.0.0
   google_sign_in: ^4.0.1+1
 
   shared_preferences: ^0.5.1+1
   date_format: ^1.0.6
-  flutter_date_picker: ^0.1.8
+#  flutter_date_picker: ^0.1.8
   flutter_cupertino_date_picker: ^0.3.0
 
   cached_network_image: ^0.7.0

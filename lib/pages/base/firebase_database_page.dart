@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/pages/base/base_page.dart';
-import 'package:flutter_flow_list/pages/settings/login_page.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
-import 'package:flutter_flow_list/util/uidata.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class FirebasePoweredPage extends BasePage {
   FirebasePoweredPage();
@@ -44,7 +42,7 @@ abstract class FirebasePoweredPageState<T extends FirebasePoweredPage>
   }
 
   Future<Null> openLoginPage() async {
-    final result = await Navigator.of(context).pushNamed(UIData.loginRoute);
+    final result = await Navigator.of(context).pushNamed(Constants.loginRoute);
 
     if (result) {
       restoreSession();
