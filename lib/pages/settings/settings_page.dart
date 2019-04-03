@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/main.dart';
 import 'package:flutter_flow_list/pages/base/stateful_page.dart';
+import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/ui/common_switch.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
@@ -10,7 +12,8 @@ class SettingsPage extends StatefulPage {
 }
 
 class _SettingsPageState extends StatefulPageState<SettingsPage> {
-  bool darkTheme = false;
+  AppTheme _appTheme;
+  UserRepository _userRepository = UserRepository.get();
 
   @override
   void initState() {
@@ -20,24 +23,38 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
 
   Future<Null> getData() async {
     await Preferences.load();
-    darkTheme = Preferences.getBool(Preferences.KEY_SETTINGS_THEME);
+    int appThemeIndex = Preferences.getInt(Preferences.KEY_SETTINGS_THEME) ?? 0;
+    _appTheme = AppTheme.values[appThemeIndex];
     showContent();
   }
 
   @override
   String getPageTitle() {
-    return "SETTINGS";
+    return "Settings";
   }
 
-  void _onAccountClicked() {
-    Navigator.pushNamed(context, Constants.settingsLoginRoute);
+  void _onAccountClicked() async {
+    showProgress();
+
+    bool signedIn = await _userRepository.isSignedInAsync();
+    if (signedIn) {
+      await _userRepository.signOut();
+    } else {
+      await _userRepository.signIn();
+    }
+
+    showContent();
   }
 
   void _onDarkThemeClicked(bool enabled) {
-    Preferences.setBool(Preferences.KEY_SETTINGS_THEME, enabled);
+    AppTheme newAppTheme = enabled ? AppTheme.dark : AppTheme.light;
+    Preferences.setInt(Preferences.KEY_SETTINGS_THEME, newAppTheme.index);
+    MainAppState mainAppState = context.ancestorStateOfType(const TypeMatcher<MainAppState>());
+    mainAppState.setAppTheme(newAppTheme);
+
     setState(() {
-      darkTheme = enabled;
-      print("Dark theme: $enabled");
+      _appTheme = newAppTheme;
+      print("App theme: $newAppTheme");
     });
   }
 
@@ -52,11 +69,10 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "General Setting",
-              style: TextStyle(color: Colors.grey.shade700),
+              style: Theme.of(context).textTheme.body2,
             ),
           ),
           Card(
-            color: Colors.white,
             elevation: 2.0,
             child: Column(
               children: <Widget>[
@@ -66,7 +82,9 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
                     color: Colors.grey,
                   ),
                   title: Text("Account"),
-                  subtitle: Text(Preferences.getString(Preferences.KEY_USER_UID, def: null) ??
+                  subtitle: Text(Preferences.getString(
+                          Preferences.KEY_USER_NICK_NAME,
+                          def: null) ??
                       "Click to log in!"),
                   onTap: _onAccountClicked,
                   trailing: Icon(Icons.arrow_right),
@@ -74,16 +92,14 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "Visual",
-              style: TextStyle(color: Colors.grey.shade700),
+              style: Theme.of(context).textTheme.body2,
             ),
           ),
           Card(
-            color: Colors.white,
             elevation: 2.0,
             child: Column(
               children: <Widget>[
@@ -95,7 +111,7 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
                   title: Text("Dark theme"),
                   trailing: CommonSwitch(
                     onChanged: _onDarkThemeClicked,
-                    defValue: darkTheme,
+                    defValue: _appTheme.index != 0,
                   ),
                 ),
               ],

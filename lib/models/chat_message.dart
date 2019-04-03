@@ -21,7 +21,7 @@ class ChatMessage extends Equatable {
     if (messageSender == MessageSender.BOT) {
       switch (chatState) {
         case ChatState.WELCOME:
-          return "Welcome";
+          return "Welcome back, ";
         case ChatState.ENTRY_1:
           return "Entry 1";
         case ChatState.ENTRY_2:

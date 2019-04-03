@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/navigation/tab_navigator.dart';
 import 'package:flutter_flow_list/ui/fancy_bottom_navigation.dart';
+import 'package:flutter_flow_list/util/preferences.dart';
 
-class App extends StatefulWidget {
+class FlowApp extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => AppState();
+  State<StatefulWidget> createState() => FlowAppState();
 }
 
-class AppState extends State<App> {
+class FlowAppState extends State<FlowApp> {
   static TabItem currentTab = TabItem.chat;
   /*
     changed currentTab to static to show the last shown navigator
@@ -28,9 +29,29 @@ class AppState extends State<App> {
       currentTab = tabItem;
     });
   }
+  
+  bool _initialized = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    initStateAsync();
+  }
+  
+  void initStateAsync() async {
+    await Preferences.load();
+
+    setState(() {
+      _initialized = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_initialized) {
+      return Center(child: Text("Loading..."));
+    }
+
     return WillPopScope(
       onWillPop: () async =>
           !await navigatorKeys[currentTab].currentState.maybePop(),

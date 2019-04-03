@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
-import 'package:flutter_flow_list/pages/base/firebase_database_page.dart';
-import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/pages/base/stateful_page.dart';
+import 'package:flutter_flow_list/repositories/flow_repository.dart';
+import 'package:flutter_flow_list/repositories/user_repository.dart';
 
-class FlowNoteDetailPage extends FirebasePoweredPage {
+class FlowNoteDetailPage extends StatefulPage {
   static const String ARG_DATE = "date";
 
   final String initDateString;
@@ -17,20 +17,17 @@ class FlowNoteDetailPage extends FirebasePoweredPage {
   _FlowNoteDetailPageState createState() => _FlowNoteDetailPageState();
 }
 
-class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPage>
+class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
     with TickerProviderStateMixin {
   DateTime _selectedDate;
-  DocumentReference _firestoreRef;
 
-  AnimationController _controller;
   TextEditingController _entry1ValueController;
   TextEditingController _entry2ValueController;
   TextEditingController _entry3ValueController;
 
   bool _isEditMode = false;
-  String _userId;
-
-  static const int kStartValue = 2;
+  FlowRepository _flowRepository = FlowRepository.get();
+  UserRepository _userRepository = UserRepository.get();
 
   @override
   void initState() {
@@ -39,20 +36,6 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
     _entry1ValueController = new TextEditingController(text: "Sample a");
     _entry2ValueController = new TextEditingController(text: "Sample b");
     _entry3ValueController = new TextEditingController(text: "Sample c");
-    _controller = new AnimationController(
-      vsync: this,
-      duration: new Duration(seconds: kStartValue),
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          print('Animation completed');
-          setState(() {});
-        }
-      });
-  }
-
-  @override
-  void initFirebaseReferences(String userId) {
-    _userId = userId;
 
     if (widget.initDateString != null) {
       _setSelectedDate(DateTime.parse(widget.initDateString));
@@ -61,16 +44,11 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
     }
   }
 
-  void _initRecordForDateTime(DateTime dateTime) async {
-    String date = formatDate(dateTime, [yyyy, '-', mm, '-', dd]);
+  void _setSelectedDate(DateTime dateTime) {
+    showProgress();
 
-    _firestoreRef = Firestore.instance
-        .collection(Constants.FIRESTORE_USERS)
-        .document(_userId)
-        .collection(Constants.FIRESTORE_FLOW_NOTES)
-        .document(date);
-
-    _firestoreRef.get().then((DocumentSnapshot snapshot) {
+    _selectedDate = dateTime;
+    _flowRepository.getFlowRecord(dateTime).then((DocumentSnapshot snapshot) {
       if (snapshot != null && snapshot.data != null) {
         _isEditMode = true;
         _entry1ValueController.text = snapshot[FlowRecord.KEY_ENTRY_1] ?? "";
@@ -88,23 +66,14 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
     });
   }
 
-  void _setSelectedDate(DateTime dateTime) {
-    _initRecordForDateTime(dateTime);
-    _selectedDate = dateTime;
-  }
-
   void _onFabClicked() {
-    Firestore.instance.runTransaction((transaction) async {
-      await transaction.set(
-        _firestoreRef,
-        {
-          FlowRecord.KEY_ENTRY_1: _entry1ValueController.text,
-          FlowRecord.KEY_ENTRY_2: _entry2ValueController.text,
-          FlowRecord.KEY_ENTRY_3: _entry3ValueController.text,
-          FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String(),
-        },
-      );
+    FlowRecord record = FlowRecord(_selectedDate, _entry1ValueController.text,
+        _entry2ValueController.text, _entry3ValueController.text);
+
+    FlowRepository.get().setFlowRecord(record).then((_) {
       Navigator.of(context).pop(true);
+    }, onError: (Object o) {
+      print(o);
     });
   }
 
@@ -140,7 +109,9 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
               new FlatButton(
                 child: new Text('Delete'),
                 onPressed: () {
-                  _firestoreRef.delete().then((_) {
+                  FlowRepository.get()
+                      .deleteFlowRecord(_selectedDate)
+                      .then((_) {
                     Navigator.of(context).pop();
                   });
                   Navigator.of(context).pop(); // close dialog
@@ -161,7 +132,7 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
   FloatingActionButton getPageFab() {
     return FloatingActionButton(
       onPressed: _onFabClicked,
-      tooltip: 'Increment',
+      tooltip: 'Submit',
       child: const Icon(Icons.check),
     );
   }
@@ -187,7 +158,7 @@ class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPa
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Text(
-                formatDate(_selectedDate, [dd, '.', mm, '.', yyyy]),
+                FlowRecord.userDateString(_selectedDate),
                 textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.black, fontSize: 30.0),
               ),

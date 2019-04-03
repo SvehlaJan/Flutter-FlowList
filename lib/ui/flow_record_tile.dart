@@ -6,7 +6,8 @@ class FlowRecordTile extends StatelessWidget {
   final FlowRecord _record;
   final VoidCallback _onTap;
 
-  FlowRecordTile(//      this._animation,
+  FlowRecordTile(
+      //      this._animation,
       this._record,
       this._onTap);
 
@@ -27,9 +28,8 @@ class FlowRecordTile extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Text(
-                          _record.date,
-                          style: TextStyle(
-                              color: Colors.black, fontSize: 30.0),
+                          _record.getUserDateString(),
+                          style: TextStyle(color: Colors.black, fontSize: 30.0),
                         ),
                       ],
                     ),
@@ -48,7 +48,6 @@ class FlowRecordTile extends StatelessWidget {
                   ],
                 )),
           )),
-//        ),
     );
   }
 }

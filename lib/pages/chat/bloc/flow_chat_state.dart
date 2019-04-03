@@ -32,6 +32,8 @@ abstract class FlowChatContent extends FlowChatState {
 class FlowChatTyping extends FlowChatContent {
   FlowChatTyping(List<ChatMessage> messages) : super(messages);
 
+  static FlowChatTyping welcome() => FlowChatTyping([ChatMessage.welcome()]);
+
   @override
   String toString() => 'FlowChatTyping { messages: ${messages.length} }';
 }
@@ -40,11 +42,7 @@ class FlowChatMessages extends FlowChatContent {
 
   FlowChatMessages(List<ChatMessage> messages) : super(messages);
 
-  static FlowChatMessages welcome() {
-    List<ChatMessage> messages = List<ChatMessage>();
-    messages.add(ChatMessage.welcome());
-    return FlowChatMessages(messages);
-  }
+  static FlowChatMessages welcome() => FlowChatMessages([ChatMessage.welcome()]);
 
   @override
   String toString() => 'FlowChatMessages { messages: ${messages.length} }';

@@ -130,32 +130,6 @@ class _LoginPageState extends State<LoginPage> {
     Preferences.setString(
         Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
 
-
-//    final QuerySnapshot result = await Firestore.instance
-//        .collection(Constants.FIRESTORE_USERS)
-//        .where(Constants.FIRESTORE_ID, isEqualTo: firebaseUser.uid)
-//        .getDocuments();
-//    final List<DocumentSnapshot> documents = result.documents;
-//    if (documents.length == 0) {
-//      // Update data to server if new user
-//      Preferences.setString(Preferences.KEY_USER_UID, firebaseUser.uid);
-//      Preferences.setString(Preferences.KEY_USER_EMAIL, firebaseUser.email);
-//      Preferences.setString(
-//          Preferences.KEY_USER_NICK_NAME, firebaseUser.displayName);
-//      Preferences.setString(
-//          Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
-//    } else {
-//      // Write data to local
-//      Preferences.setString(
-//          Preferences.KEY_USER_UID, documents[0][Constants.FIRESTORE_ID]);
-//      Preferences.setString(
-//          Preferences.KEY_USER_EMAIL, documents[0][Constants.FIRESTORE_EMAIL]);
-//      Preferences.setString(Preferences.KEY_USER_NICK_NAME,
-//          documents[0][Constants.FIRESTORE_NICKNAME]);
-//      Preferences.setString(Preferences.KEY_USER_PHOTO_URL,
-//          documents[0][Constants.FIRESTORE_PHOTO_URL]);
-//    }
-
     Navigator.of(context).pop(true);
   }
 
@@ -197,42 +171,39 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(16.0),
               child: new Form(
                   key: formKey,
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      new TextFormField(
-                        keyboardType: TextInputType.emailAddress,
-                        key: new Key('email'),
-                        decoration: new InputDecoration(labelText: 'Email'),
-                        validator: (val) =>
-                            val.isEmpty ? 'Email can\'t be empty.' : null,
-                        onSaved: (val) => _email = val,
-                      ),
-                      new TextFormField(
-                        key: new Key('password'),
-                        decoration: new InputDecoration(labelText: 'Password'),
-                        obscureText: true,
-                        validator: (val) =>
-                            val.isEmpty ? 'Password can\'t be empty.' : null,
-                        onSaved: (val) => _password = val,
-                      ),
-                      new RaisedButton(
-                          key: new Key('login'),
-                          child: new Text('Login',
-                              style: new TextStyle(fontSize: 20.0)),
-                          onPressed: validateAndSubmit),
-                      new Container(
-                          height: 80.0,
-                          padding: const EdgeInsets.all(32.0),
-                          child: buildHintText()),
-                      new RaisedButton(
-                          key: new Key('google_login'),
-                          color: Colors.redAccent,
-                          child: new Text('Google Login',
-                              style: new TextStyle(
-                                  fontSize: 20.0, color: Colors.white)),
-                          onPressed: signInWithGoogle),
-                    ],
+                  child: Center(
+                    child:
+//                      new TextFormField(
+//                        keyboardType: TextInputType.emailAddress,
+//                        key: new Key('email'),
+//                        decoration: new InputDecoration(labelText: 'Email'),
+//                        validator: (val) =>
+//                            val.isEmpty ? 'Email can\'t be empty.' : null,
+//                        onSaved: (val) => _email = val,
+//                      ),
+//                      new TextFormField(
+//                        key: new Key('password'),
+//                        decoration: new InputDecoration(labelText: 'Password'),
+//                        obscureText: true,
+//                        validator: (val) =>
+//                            val.isEmpty ? 'Password can\'t be empty.' : null,
+//                        onSaved: (val) => _password = val,
+//                      ),
+//                      new RaisedButton(
+//                          key: new Key('login'),
+//                          child: new Text('Login',
+//                              style: new TextStyle(fontSize: 20.0)),
+//                          onPressed: validateAndSubmit),
+//                      new Container(
+//                          height: 80.0,
+//                          padding: const EdgeInsets.all(32.0),
+//                          child: buildHintText()),
+                        new RaisedButton(
+                            key: new Key('google_login'),
+                            color: Colors.redAccent,
+                            child: new Text('Google Login',
+                                style: Theme.of(context).textTheme.title),
+                            onPressed: signInWithGoogle),
                   )))),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_flow_list/bloc/flow_chat_bloc.dart';
-import 'package:flutter_flow_list/bloc/flow_chat_event.dart';
-import 'package:flutter_flow_list/bloc/flow_chat_state.dart';
+import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_bloc.dart';
+import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_event.dart';
+import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_state.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/pages/base/base_page.dart';
 
@@ -17,13 +17,14 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   final _scrollController = ScrollController();
   final FlowChatBloc _flowChatBloc = FlowChatBloc();
   final TextEditingController _inputController = new TextEditingController();
-  final FocusNode focusNode = new FocusNode();
+  final FocusNode _focusNode = new FocusNode();
 
   @override
   void initState() {
     super.initState();
 //    _scrollController.addListener(_onScroll);
-    focusNode.addListener(_onFocusChange);
+    _flowChatBloc.dispatch(AppStarted());
+    _focusNode.addListener(_onFocusChange);
   }
 
   @override
@@ -33,12 +34,17 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   }
 
   void _onFocusChange() {
-    if (focusNode.hasFocus) {
+    if (_focusNode.hasFocus) {
       // Hide sticker when keyboard appear
 //      setState(() {
 //        isShowSticker = false;
 //      });
     }
+  }
+
+  @override
+  String getPageTitle() {
+    return 'Flow notes';
   }
 
   @override
@@ -92,38 +98,38 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   }
 
   Widget _buildChatInput(BuildContext context, FlowChatContent state) {
-    return Row(
-      children: <Widget>[
-        Flexible(
-          child: Container(
-            child: TextField(
-              style: Theme.of(context).textTheme.body2,
-              controller: _inputController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(10.0),
-                border: InputBorder.none,
-                hintText: 'Type your message...',
-                hintStyle: Theme.of(context).textTheme.body1,
+    bool enabled = !(state is FlowChatTyping);
+    return Material(
+        elevation: 4,
+        color: Colors.white,
+        child: Container(
+          padding: EdgeInsets.all(8),
+          child: Row(
+            children: <Widget>[
+              Flexible(
+                child: TextField(
+                  style: Theme.of(context).textTheme.body2,
+                  controller: _inputController,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(10.0),
+                    border: InputBorder.none,
+                    hintText: 'Type your message...',
+                    hintStyle: Theme.of(context).textTheme.body1,
+                  ),
+                  focusNode: _focusNode,
+                ),
               ),
-              focusNode: focusNode,
-            ),
+              Material(
+                child: new IconButton(
+                  icon: new Icon(Icons.send),
+                  onPressed: enabled ? () => onSendMessage(_inputController.text) : null,
+                  color: Theme.of(context).primaryColor,
+                ),
+                color: Colors.white,
+              ),
+            ],
           ),
-        ),
-
-        // Button send message
-        Material(
-          child: new Container(
-            margin: new EdgeInsets.symmetric(horizontal: 8.0),
-            child: new IconButton(
-              icon: new Icon(Icons.send),
-              onPressed: () => onSendMessage(_inputController.text),
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          color: Colors.white,
-        ),
-      ],
-    );
+        ));
   }
 
   void onSendMessage(String text) {
@@ -139,23 +145,67 @@ class ChatMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool fromBot = message.messageSender == MessageSender.BOT;
-    bool fromUser = message.messageSender == MessageSender.USER;
-    return ListTile(
-      leading: fromBot ? Icon(Icons.android) : null,
-      trailing: fromUser ? Icon(Icons.person) : null,
-      title: Text(message.getMessageBody(),
-          textAlign: fromBot ? TextAlign.start : TextAlign.end),
-    );
+    bool fromUser =
+        message != null && message.messageSender == MessageSender.USER;
+    return ChatBubble(
+        message: message,
+        child: ListTile(
+          leading: fromUser ? null : Icon(Icons.android),
+          trailing: fromUser ? Icon(Icons.person) : null,
+          title: Text(message.getMessageBody(),
+              textAlign: fromUser ? TextAlign.end : TextAlign.start),
+        ));
   }
 }
 
 class ChatTypingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(Icons.android),
-      title: Text("..."),
-    );
+    return ChatBubble(
+        message: null,
+        child: ListTile(
+          leading: Icon(Icons.android),
+          title: Text("..."),
+        ));
+  }
+}
+
+class ChatBubble extends Container {
+  final ChatMessage message;
+  final Widget child;
+
+  ChatBubble({this.message, this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    bool fromUser =
+        message != null && message.messageSender == MessageSender.USER;
+
+    final bg = fromUser ? Colors.white : Colors.blue.shade50;
+    final radius = fromUser
+        ? BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            bottomLeft: Radius.circular(10.0),
+            bottomRight: Radius.circular(15.0),
+          )
+        : BorderRadius.only(
+            topRight: Radius.circular(10.0),
+            bottomLeft: Radius.circular(15.0),
+            bottomRight: Radius.circular(10.0),
+          );
+
+    return Container(
+        child: child,
+        margin: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                blurRadius: .5,
+                spreadRadius: 1.0,
+                color: Colors.black.withOpacity(.12))
+          ],
+          color: bg,
+          borderRadius: radius,
+        ));
   }
 }

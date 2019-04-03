@@ -2,6 +2,11 @@ import 'package:equatable/equatable.dart';
 
 abstract class FlowChatEvent extends Equatable {}
 
+class AppStarted extends FlowChatEvent {
+  @override
+  String toString() => 'AppStarted { }';
+}
+
 class Message extends FlowChatEvent {
   final String body;
 
