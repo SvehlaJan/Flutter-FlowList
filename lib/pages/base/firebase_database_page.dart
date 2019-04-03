@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/pages/base/base_page.dart';
+import 'package:flutter_flow_list/pages/base/stateful_page.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 
-abstract class FirebasePoweredPage extends BasePage {
-  FirebasePoweredPage();
+abstract class FirebasePoweredPage extends StatefulPage {
+  FirebasePoweredPage() : super();
 }
 
 abstract class FirebasePoweredPageState<T extends FirebasePoweredPage>
-    extends BasePageState<T> {
+    extends StatefulPageState<T> {
   String userId;
 
   @override

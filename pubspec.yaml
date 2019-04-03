@@ -20,7 +20,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_bloc: ^0.9.1
 #  kt_dart: ^0.5.0
+  equatable: ^0.2.3
   cupertino_icons: ^0.1.2
 
   flutter_crashlytics: ^0.2.1+1
@@ -28,7 +30,7 @@ dependencies:
 
   firebase_analytics: ^2.0.3
 #  firebase_database: ^2.0.2
-  firebase_auth: ^0.8.2
+  firebase_auth: ^0.8.3
   firebase_storage: 2.1.0+1
   cloud_firestore: 0.9.7
 

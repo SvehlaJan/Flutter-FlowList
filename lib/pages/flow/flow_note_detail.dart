@@ -1,27 +1,23 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
-
-//import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
-import 'package:flutter_flow_list/entities/flow_record_entity.dart';
+import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/base/firebase_database_page.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 
-class KoprAddNotePage extends FirebasePoweredPage {
+class FlowNoteDetailPage extends FirebasePoweredPage {
   static const String ARG_DATE = "date";
 
   final String initDateString;
 
-  KoprAddNotePage({this.initDateString});
+  FlowNoteDetailPage({this.initDateString});
 
   @override
-  _KoprAddNotePageState createState() => new _KoprAddNotePageState();
+  _FlowNoteDetailPageState createState() => _FlowNoteDetailPageState();
 }
 
-class _KoprAddNotePageState extends FirebasePoweredPageState<KoprAddNotePage>
+class _FlowNoteDetailPageState extends FirebasePoweredPageState<FlowNoteDetailPage>
     with TickerProviderStateMixin {
   DateTime _selectedDate;
   DocumentReference _firestoreRef;

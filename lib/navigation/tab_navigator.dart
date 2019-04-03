@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/pages/base/notfound_page.dart';
-import 'package:flutter_flow_list/pages/chat/chat_page.dart';
-import 'package:flutter_flow_list/pages/kopr/kopr_add_page.dart';
-import 'package:flutter_flow_list/pages/kopr/kopr_list_page.dart';
+import 'package:flutter_flow_list/pages/chat/flow_chat_page.dart';
+import 'package:flutter_flow_list/pages/flow/flow_note_detail.dart';
+import 'package:flutter_flow_list/pages/flow/flow_notes_list.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';
 import 'package:flutter_flow_list/pages/settings/settings_page.dart';
 import 'package:flutter_flow_list/ui/fancy_bottom_navigation.dart';
@@ -28,19 +28,19 @@ class TabNavigator extends StatelessWidget {
       case Constants.chatRoute:
         return MaterialPageRoute<void>(
             settings: settings,
-            builder: (BuildContext context) => NotFoundPage());
+            builder: (BuildContext context) => FlowChatPage());
       case Constants.koprRoute:
         return MaterialPageRoute<void>(
             settings: settings,
-            builder: (BuildContext context) => KoprListPage());
+            builder: (BuildContext context) => FlowNotesListPage());
       case Constants.koprAddRoute:
         String date;
-        if (arguments != null && arguments.containsKey(KoprAddNotePage.ARG_DATE)) {
-          date = arguments[KoprAddNotePage.ARG_DATE];
+        if (arguments != null && arguments.containsKey(FlowNoteDetailPage.ARG_DATE)) {
+          date = arguments[FlowNoteDetailPage.ARG_DATE];
         }
         return MaterialPageRoute<void>(
             settings: settings,
-            builder: (BuildContext context) => KoprAddNotePage(initDateString: date));
+            builder: (BuildContext context) => FlowNoteDetailPage(initDateString: date));
       case Constants.settingsRoute:
         return MaterialPageRoute<void>(
             settings: settings,

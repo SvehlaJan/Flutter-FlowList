@@ -1,9 +1,12 @@
+import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/app.dart';
-import 'package:flutter_flow_list/pages/base/notfound_page.dart';
-import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/bloc/simple_bloc_delegate.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  BlocSupervisor().delegate = SimpleBlocDelegate();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -24,12 +27,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: App(),
-//      routes: {
-//        UIData.homeRoute: (BuildContext context) => App(),
-//        "/inputPage": (BuildContext context) => InputPage(),
-//      },
-//      onUnknownRoute: (RouteSettings rs) =>
-//          new MaterialPageRoute(builder: (context) => new NotFoundPage()),
     );
   }
 }

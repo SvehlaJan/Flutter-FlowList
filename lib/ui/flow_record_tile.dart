@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/entities/flow_record_entity.dart';
+import 'package:flutter_flow_list/models/flow_record.dart';
 
 class FlowRecordTile extends StatelessWidget {
 //  final Animation<double> _animation;

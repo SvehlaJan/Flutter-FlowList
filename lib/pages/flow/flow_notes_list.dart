@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/entities/flow_record_entity.dart';
+import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/base/firebase_database_page.dart';
-import 'package:flutter_flow_list/pages/kopr/kopr_add_page.dart';
+import 'package:flutter_flow_list/pages/flow/flow_note_detail.dart';
 import 'package:flutter_flow_list/ui/flow_record_tile.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 
-class KoprListPage extends FirebasePoweredPage {
+class FlowNotesListPage extends FirebasePoweredPage {
   @override
-  _KoprFlowPageState createState() => new _KoprFlowPageState();
+  _FlowNotesListPageState createState() => new _FlowNotesListPageState();
 }
 
-class _KoprFlowPageState extends FirebasePoweredPageState<KoprListPage>
+class _FlowNotesListPageState extends FirebasePoweredPageState<FlowNotesListPage>
     with TickerProviderStateMixin {
   final ScrollController listScrollController = new ScrollController();
   static const int kStartValue = 2;
@@ -41,7 +41,7 @@ class _KoprFlowPageState extends FirebasePoweredPageState<KoprListPage>
       context,
       Constants.koprAddRoute,
       arguments: {
-        KoprAddNotePage.ARG_DATE: date,
+        FlowNoteDetailPage.ARG_DATE: date,
       },
     );
   }

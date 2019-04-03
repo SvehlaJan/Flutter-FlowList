@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 
 abstract class BasePage extends StatefulWidget {
-  BasePage();
-
-//  @override
-//  BasePageState createState() => new BasePageState();
+  BasePage() : super();
 }
 
-enum BaseState { progress, empty, content }
-
 abstract class BasePageState<T extends BasePage> extends State<T> {
-  BaseState currentState;
   BuildContext scaffoldContext;
-
-  @override
-  void initState() {
-    super.initState();
-
-    currentState = BaseState.progress;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,40 +36,9 @@ abstract class BasePageState<T extends BasePage> extends State<T> {
     return null;
   }
 
-  Widget buildBody() {
-    switch (currentState) {
-      case BaseState.progress:
-        return getProgressView();
-      case BaseState.empty:
-        return getEmptyView();
-      case BaseState.content:
-        return getContentView();
-      default:
-        return Container(child: Center(child: Text("No state...")));
-    }
-  }
+  Widget buildBody();
 
   //////////////////////////////////////////////////////////////////////////////
-
-  void showProgress({bool force = false}) {
-    _setBaseState(force, BaseState.progress);
-  }
-
-  void showEmpty({bool force = false}) {
-    _setBaseState(force, BaseState.empty);
-  }
-
-  void showContent({bool force = false}) {
-    _setBaseState(force, BaseState.content);
-  }
-
-  void _setBaseState(bool force, BaseState newState) {
-    if (newState != currentState || force) {
-      setState(() {
-        currentState = newState;
-      });
-    }
-  }
 
   Widget getProgressView() {
     return Material(

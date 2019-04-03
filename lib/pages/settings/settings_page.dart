@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/pages/base/base_page.dart';
+import 'package:flutter_flow_list/pages/base/stateful_page.dart';
 import 'package:flutter_flow_list/ui/common_switch.dart';
-import 'package:flutter_flow_list/util/preferences.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_flow_list/util/preferences.dart';
 
-class SettingsPage extends BasePage {
+class SettingsPage extends StatefulPage {
   @override
   State<StatefulWidget> createState() => new _SettingsPageState();
 }
 
-class _SettingsPageState extends BasePageState<SettingsPage> {
+class _SettingsPageState extends StatefulPageState<SettingsPage> {
   bool darkTheme = false;
 
   @override
