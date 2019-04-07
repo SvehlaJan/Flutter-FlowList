@@ -28,11 +28,12 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
       _flowRepository.getFlowRecord().then((DocumentSnapshot snapshot) {
         if (snapshot != null && snapshot.data != null) {
           _isEditMode = true;
-          _flowRecord = FlowRecord.withDateStr(
-              snapshot.documentID,
-              snapshot.data[FlowRecord.KEY_ENTRY_1],
-              snapshot.data[FlowRecord.KEY_ENTRY_2],
-              snapshot.data[FlowRecord.KEY_ENTRY_3]);
+          _flowRecord = FlowRecord.withDateStr(snapshot.documentID,
+              firstEntry: snapshot.data[FlowRecord.KEY_ENTRY_1],
+              secondEntry: snapshot.data[FlowRecord.KEY_ENTRY_2],
+              thirdEntry: snapshot.data[FlowRecord.KEY_ENTRY_3],
+              imageUrl: snapshot.data[FlowRecord.KEY_IMAGE_URL],
+              dayScore: snapshot.data[FlowRecord.KEY_DAY_SCORE]);
         } else {
           _isEditMode = false;
         }
@@ -83,8 +84,8 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
         List<ChatMessage> messages =
             (currentState as FlowChatMessages).messages;
 
-        if (event is Message) {
-          processMessage(chatState, messages, event.body);
+        if (event is MessageText) {
+          processMessage(chatState, messages, event.body, event.type);
 
           yield FlowChatTyping(messages);
           dispatch(TypingStart());
@@ -95,10 +96,13 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
     }
   }
 
-  void processMessage(
-      ChatState chatState, List<ChatMessage> messages, String body) {
+  void processMessage(ChatState chatState, List<ChatMessage> messages,
+      String body, MessageType type) {
     ChatMessage userMessage = ChatMessage(
-        chatState: chatState, messageSender: MessageSender.USER, body: body);
+        chatState: chatState,
+        messageSender: MessageSender.USER,
+        body: body,
+        type: type);
 
     ChatMessage responseMessage;
     switch (chatState) {
@@ -125,6 +129,8 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
             chatState: ChatState.PICTURE, messageSender: MessageSender.BOT);
         break;
       case ChatState.PICTURE:
+        _flowRecord.imageUrl = body;
+        _flowRepository.setFlowRecord(_flowRecord);
         responseMessage = ChatMessage(
             chatState: ChatState.WELCOME, messageSender: MessageSender.BOT);
         break;

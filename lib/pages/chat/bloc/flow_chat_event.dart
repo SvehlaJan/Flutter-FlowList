@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_flow_list/models/chat_message.dart';
 
 abstract class FlowChatEvent extends Equatable {}
 
@@ -7,10 +8,11 @@ class AppStarted extends FlowChatEvent {
   String toString() => 'AppStarted { }';
 }
 
-class Message extends FlowChatEvent {
+class MessageText extends FlowChatEvent {
   final String body;
+  final MessageType type;
 
-  Message({this.body});
+  MessageText({this.body, this.type});
 
   @override
   String toString() => 'Message { body: $body }';

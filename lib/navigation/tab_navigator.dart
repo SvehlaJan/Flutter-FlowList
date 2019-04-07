@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/navigation/tab_helper.dart';
 import 'package:flutter_flow_list/pages/base/notfound_page.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_page.dart';
 import 'package:flutter_flow_list/pages/flow/flow_note_detail.dart';
 import 'package:flutter_flow_list/pages/flow/flow_notes_list.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';
 import 'package:flutter_flow_list/pages/settings/settings_page.dart';
-import 'package:flutter_flow_list/ui/fancy_bottom_navigation.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 
 class TabNavigator extends StatelessWidget {
@@ -58,7 +58,7 @@ class TabNavigator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      initialRoute: TabHelper.initialRoute(tabItem),
+      initialRoute: TabHelper.getInitialRoute(tabItem),
       onGenerateRoute: _getRoute,
       onUnknownRoute: (routeSettings) {
         return MaterialPageRoute(builder: (context) => NotFoundPage());

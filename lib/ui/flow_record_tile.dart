@@ -1,10 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
+import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 
 class FlowRecordTile extends StatelessWidget {
 //  final Animation<double> _animation;
   final FlowRecord _record;
   final VoidCallback _onTap;
+  final UserRepository _userRepository = UserRepository.get();
 
   FlowRecordTile(
       //      this._animation,
@@ -17,37 +21,45 @@ class FlowRecordTile extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: _onTap,
       child: Card(
-          color: Colors.white,
-          child: Center(
-            child: new Container(
-                padding: new EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          _record.getUserDateString(),
-                          style: TextStyle(color: Colors.black, fontSize: 30.0),
-                        ),
-                      ],
+        elevation: 4.0,
+          color: Theme.of(context).cardColor,
+          child: Container(
+              padding: EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ClipOval(
+                    child: CachedNetworkImage(
+                      width: Constants.avatarImageSize,
+                      height: Constants.avatarImageSize,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      imageUrl: _userRepository.getPhotoUrl() ?? "",
+                      fit: BoxFit.cover,
                     ),
-                    Text(
-                      _record.firstEntry,
-                      style: TextStyle(color: Colors.black, fontSize: 16.0),
-                    ),
-                    Text(
-                      _record.secondEntry,
-                      style: TextStyle(color: Colors.black, fontSize: 16.0),
-                    ),
-                    Text(
-                      _record.thirdEntry,
-                      style: TextStyle(color: Colors.black, fontSize: 16.0),
-                    ),
-                  ],
-                )),
-          )),
+                  ),
+                  Container(width: 12.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(_record.getUserDateString(),
+                          style: Theme.of(context).textTheme.subtitle),
+                      Container(height: 4.0),
+                      Text(
+                        "1. " + (_record.firstEntry ?? ""),
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+//                      Container(height: 2.0),
+                      Text("2. " + (_record.secondEntry ?? ""),
+                          style: Theme.of(context).textTheme.caption),
+//                      Container(height: 2.0),
+                      Text("3. " + (_record.thirdEntry ?? ""),
+                          style: Theme.of(context).textTheme.caption),
+                    ],
+                  ),
+                ],
+              ))),
     );
   }
 }

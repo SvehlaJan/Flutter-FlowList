@@ -49,7 +49,8 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
   void _onDarkThemeClicked(bool enabled) {
     AppTheme newAppTheme = enabled ? AppTheme.dark : AppTheme.light;
     Preferences.setInt(Preferences.KEY_SETTINGS_THEME, newAppTheme.index);
-    MainAppState mainAppState = context.ancestorStateOfType(const TypeMatcher<MainAppState>());
+    MainAppState mainAppState =
+        context.ancestorStateOfType(const TypeMatcher<MainAppState>());
     mainAppState.setAppTheme(newAppTheme);
 
     setState(() {
@@ -73,23 +74,18 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
             ),
           ),
           Card(
-            elevation: 2.0,
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(
-                    Icons.person,
-                    color: Colors.grey,
-                  ),
-                  title: Text("Account"),
-                  subtitle: Text(Preferences.getString(
-                          Preferences.KEY_USER_NICK_NAME,
-                          def: null) ??
-                      "Click to log in!"),
-                  onTap: _onAccountClicked,
-                  trailing: Icon(Icons.arrow_right),
-                ),
-              ],
+            child: ListTile(
+              leading: Icon(
+                Icons.person,
+                color: Colors.grey,
+              ),
+              title: Text("Account"),
+              subtitle: Text(Preferences.getString(
+                      Preferences.KEY_USER_NICK_NAME,
+                      def: null) ??
+                  "Click to log in!"),
+              onTap: _onAccountClicked,
+              trailing: Icon(Icons.arrow_right),
             ),
           ),
           Padding(
@@ -100,21 +96,16 @@ class _SettingsPageState extends StatefulPageState<SettingsPage> {
             ),
           ),
           Card(
-            elevation: 2.0,
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(
-                    Icons.format_paint,
-                    color: Colors.grey,
-                  ),
-                  title: Text("Dark theme"),
-                  trailing: CommonSwitch(
-                    onChanged: _onDarkThemeClicked,
-                    defValue: _appTheme.index != 0,
-                  ),
-                ),
-              ],
+            child: ListTile(
+              leading: Icon(
+                Icons.format_paint,
+                color: Colors.grey,
+              ),
+              title: Text("Dark theme"),
+              trailing: CommonSwitch(
+                onChanged: _onDarkThemeClicked,
+                defValue: _appTheme.index != 0,
+              ),
             ),
           ),
         ],

@@ -1,23 +1,30 @@
+import 'dart:io';
+import 'package:flutter_flow_list/repositories/flow_repository.dart';
+import 'package:flutter_flow_list/util/constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flow_list/pages/base/stateful_page.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_bloc.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_state.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
-import 'package:flutter_flow_list/pages/base/base_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker/image_picker.dart';
 
-class FlowChatPage extends BasePage {
+class FlowChatPage extends StatefulPage {
   FlowChatPage() : super();
 
   @override
   _FlowChatPageState createState() => _FlowChatPageState();
 }
 
-class _FlowChatPageState extends BasePageState<FlowChatPage> {
+class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
   final _scrollController = ScrollController();
   final FlowChatBloc _flowChatBloc = FlowChatBloc();
   final TextEditingController _inputController = new TextEditingController();
   final FocusNode _focusNode = new FocusNode();
+  final FlowRepository _flowRepository = FlowRepository.get();
 
   @override
   void initState() {
@@ -25,6 +32,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
 //    _scrollController.addListener(_onScroll);
     _flowChatBloc.dispatch(AppStarted());
     _focusNode.addListener(_onFocusChange);
+    showContent();
   }
 
   @override
@@ -48,7 +56,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   }
 
   @override
-  Widget buildBody() {
+  Widget getContentView() {
     return BlocBuilder(
       bloc: _flowChatBloc,
       builder: (BuildContext context, FlowChatState state) {
@@ -101,17 +109,31 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
     bool enabled = !(state is FlowChatTyping);
     return Material(
         elevation: 4,
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         child: Container(
-          padding: EdgeInsets.all(8),
           child: Row(
             children: <Widget>[
+              InkWell(
+                onTap: enabled ? () => _getImage(ImageSource.gallery) : null,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Icon(Icons.image,
+                      color: enabled
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).disabledColor),
+                ),
+              ),
               Flexible(
                 child: TextField(
-                  style: Theme.of(context).textTheme.body2,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: Theme.of(context).textTheme.body1,
                   controller: _inputController,
+                  autofocus: false,
+                  textInputAction: TextInputAction.newline,
+                  maxLines: null,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
                     border: InputBorder.none,
                     hintText: 'Type your message...',
                     hintStyle: Theme.of(context).textTheme.body1,
@@ -119,22 +141,50 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
                   focusNode: _focusNode,
                 ),
               ),
-              Material(
-                child: new IconButton(
-                  icon: new Icon(Icons.send),
-                  onPressed: enabled ? () => onSendMessage(_inputController.text) : null,
-                  color: Theme.of(context).primaryColor,
+              InkWell(
+                onTap: enabled
+                    ? () => _onSendMessage(_inputController.text)
+                    : null,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Icon(Icons.send,
+                      color: enabled
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).disabledColor),
                 ),
-                color: Colors.white,
+//                  onPressed: enabled
+//                      ? () => _onSendMessage(_inputController.text)
+//                      : null,
               ),
             ],
           ),
         ));
   }
 
-  void onSendMessage(String text) {
+  void _onSendMessage(String text, [MessageType type = MessageType.TEXT]) {
     _inputController.clear();
-    _flowChatBloc.dispatch(Message(body: text));
+    _flowChatBloc.dispatch(MessageText(body: text, type: type));
+  }
+
+  Future<void> _getImage(ImageSource source) async {
+    showProgress();
+    File imageFile = await ImagePicker.pickImage(
+        source: source,
+        maxHeight: Constants.uploadImageMaxSize,
+        maxWidth: Constants.uploadImageMaxSize);
+
+    if (imageFile != null) {
+      await uploadFile(imageFile);
+    }
+    showContent();
+  }
+
+  Future<void> uploadFile(File imageFile) async {
+    _flowRepository.uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
+      _onSendMessage(downloadUrl, MessageType.IMAGE);
+    }, onError: (err) {
+      Fluttertoast.showToast(msg: 'This file is not an image');
+    });
   }
 }
 
@@ -147,14 +197,32 @@ class ChatMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     bool fromUser =
         message != null && message.messageSender == MessageSender.USER;
-    return ChatBubble(
-        message: message,
-        child: ListTile(
-          leading: fromUser ? null : Icon(Icons.android),
-          trailing: fromUser ? Icon(Icons.person) : null,
-          title: Text(message.getMessageBody(),
-              textAlign: fromUser ? TextAlign.end : TextAlign.start),
-        ));
+    Widget body;
+    if (message.type == MessageType.TEXT) {
+      body = ListTile(
+        leading: fromUser ? null : Icon(Icons.android),
+        trailing: fromUser ? Icon(Icons.person) : null,
+        title: Text(message.getMessageBody(),
+            style: Theme.of(context).textTheme.body1,
+            textAlign: fromUser ? TextAlign.end : TextAlign.start),
+      );
+    } else if (message.type == MessageType.IMAGE) {
+      double width = 200;
+      double height = 200;
+      body = Container(
+          child: CachedNetworkImage(
+              placeholder: (context, url) => SizedBox(
+                    child: CircularProgressIndicator(),
+                    width: width,
+                    height: height,
+                  ),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+              imageUrl: message.body,
+              width: width,
+              height: height,
+              fit: BoxFit.scaleDown));
+    }
+    return ChatBubble(message: message, child: body);
   }
 }
 
@@ -181,7 +249,9 @@ class ChatBubble extends Container {
     bool fromUser =
         message != null && message.messageSender == MessageSender.USER;
 
-    final bg = fromUser ? Colors.white : Colors.blue.shade50;
+    final bg = fromUser
+        ? Theme.of(context).cardColor
+        : Theme.of(context).primaryColorLight;
     final radius = fromUser
         ? BorderRadius.only(
             topLeft: Radius.circular(10.0),

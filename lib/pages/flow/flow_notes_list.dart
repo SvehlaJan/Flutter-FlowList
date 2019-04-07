@@ -16,8 +16,7 @@ class FlowNotesListPage extends StatefulPage {
   _FlowNotesListPageState createState() => new _FlowNotesListPageState();
 }
 
-class _FlowNotesListPageState
-    extends StatefulPageState<FlowNotesListPage>
+class _FlowNotesListPageState extends StatefulPageState<FlowNotesListPage>
     with TickerProviderStateMixin {
   final ScrollController listScrollController = new ScrollController();
   FlowRepository _flowRepository = FlowRepository.get();
@@ -85,7 +84,6 @@ class _FlowNotesListPageState
                             Theme.of(context).accentColor)));
               } else {
                 return ListView.builder(
-                  padding: EdgeInsets.all(10.0),
                   itemBuilder: (context, index) =>
                       _buildItem(index, snapshot.data.documents[index]),
                   itemCount: snapshot.data.documents.length,
@@ -116,11 +114,7 @@ class _FlowNotesListPageState
   }
 
   Widget _buildItem(int index, DocumentSnapshot document) {
-    FlowRecord record = FlowRecord.withDateStr(
-        document.documentID,
-        document[FlowRecord.KEY_ENTRY_1],
-        document[FlowRecord.KEY_ENTRY_2],
-        document[FlowRecord.KEY_ENTRY_3]);
+    FlowRecord record = FlowRecord.fromSnapShot(document);
     return FlowRecordTile(record, (() {
       _openRecordEditPage(document.documentID);
     }));

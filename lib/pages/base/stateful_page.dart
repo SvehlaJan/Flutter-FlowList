@@ -7,7 +7,8 @@ abstract class StatefulPage extends BasePage {
 
 enum StatefulState { progress, empty, content }
 
-abstract class StatefulPageState<T extends StatefulPage> extends BasePageState<T> {
+abstract class StatefulPageState<T extends StatefulPage>
+    extends BasePageState<T> {
   StatefulState currentState;
 
   @override
@@ -53,18 +54,14 @@ abstract class StatefulPageState<T extends StatefulPage> extends BasePageState<T
   }
 
   Widget getProgressView() {
-    return Material(
-        color: Colors.white, child: Center(child: CircularProgressIndicator()));
+    return Material(child: Center(child: CircularProgressIndicator()));
   }
 
   Widget getEmptyView() {
-    return Material(
-        color: Colors.white, child: Center(child: Text("No data...")));
+    return Material(child: Center(child: Text("No data...")));
   }
 
   Widget getContentView() {
-    return Material(
-        color: Colors.white,
-        child: Center(child: Text("No content... override!")));
+    return Material(child: Center(child: Text("No content... override!")));
   }
 }

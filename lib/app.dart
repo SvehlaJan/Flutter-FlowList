@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/navigation/tab_helper.dart';
 import 'package:flutter_flow_list/navigation/tab_navigator.dart';
-import 'package:flutter_flow_list/ui/fancy_bottom_navigation.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 
 class FlowApp extends StatefulWidget {
@@ -10,6 +10,7 @@ class FlowApp extends StatefulWidget {
 
 class FlowAppState extends State<FlowApp> {
   static TabItem currentTab = TabItem.chat;
+
   /*
     changed currentTab to static to show the last shown navigator
     if it is not static it shows always the red Navigator if you pop from inputPage and not the last opened one
@@ -24,20 +25,26 @@ class FlowAppState extends State<FlowApp> {
     TabItem.settings: GlobalKey<NavigatorState>(),
   };
 
+  void _selectTabIndex(int tabIndex) {
+    setState(() {
+      currentTab = TabHelper.item(index: tabIndex);
+    });
+  }
+
   void _selectTab(TabItem tabItem) {
     setState(() {
       currentTab = tabItem;
     });
   }
-  
+
   bool _initialized = false;
-  
+
   @override
   void initState() {
     super.initState();
     initStateAsync();
   }
-  
+
   void initStateAsync() async {
     await Preferences.load();
 
@@ -61,10 +68,20 @@ class FlowAppState extends State<FlowApp> {
           _buildOffstageNavigator(TabItem.chat),
           _buildOffstageNavigator(TabItem.settings),
         ]),
-        bottomNavigationBar: FancyBottomNavigation(
-          currentTab,
-          onTabChanged: _selectTab,
+        bottomNavigationBar: BottomNavigationBar(
+          showUnselectedLabels: false,
+          showSelectedLabels: false,
+          backgroundColor: Theme.of(context).primaryColor,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white54,
+          items: TabHelper.getItems(context),
+          currentIndex: currentTab.index,
+          onTap: _selectTabIndex,
         ),
+//        bottomNavigationBar: FancyBottomNavigation(
+//          currentTab,
+//          onTabChanged: _selectTab,
+//        ),
       ),
     );
   }

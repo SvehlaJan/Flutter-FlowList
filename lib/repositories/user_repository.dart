@@ -57,8 +57,12 @@ class UserRepository {
     Preferences.setString(Preferences.KEY_USER_PHOTO_URL, null);
   }
 
-  Future<String> getUserName() async {
-    return (await _auth.currentUser()).displayName;
+  String getUserName() {
+    return Preferences.getString(Preferences.KEY_USER_NICK_NAME);
+  }
+
+  String getPhotoUrl() {
+    return Preferences.getString(Preferences.KEY_USER_PHOTO_URL);
   }
 
   Future<void> _onSuccess(FirebaseUser firebaseUser) async {

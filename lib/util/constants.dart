@@ -15,9 +15,10 @@ class Constants {
   static const String FIRESTORE_EMAIL = "email";
   static const String FIRESTORE_PHOTO_URL = "photo_url";
 
+  static const double uploadImageMaxSize = 1024;
+  static const double avatarImageSize = 52;
 
   //routes
-//  static const String homeRoute = "/";
   static const String loginRoute = "login";
   static const String detailRoute = "/detail";
   static const String koprRoute = "kopr";

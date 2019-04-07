@@ -37,22 +37,4 @@ abstract class BasePageState<T extends BasePage> extends State<T> {
   }
 
   Widget buildBody();
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  Widget getProgressView() {
-    return Material(
-        color: Colors.white, child: Center(child: CircularProgressIndicator()));
-  }
-
-  Widget getEmptyView() {
-    return Material(
-        color: Colors.white, child: Center(child: Text("No data...")));
-  }
-
-  Widget getContentView() {
-    return Material(
-        color: Colors.white,
-        child: Center(child: Text("No content... override!")));
-  }
 }

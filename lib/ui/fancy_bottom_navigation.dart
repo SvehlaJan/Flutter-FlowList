@@ -1,72 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/main.dart';
-import 'package:flutter_flow_list/util/constants.dart';
-import 'fancy_tab_item.dart';
+import 'package:flutter_flow_list/navigation/tab_helper.dart';
 import 'package:vector_math/vector_math.dart' as vector;
-
-enum TabItem { list, chat, settings }
-
-class TabHelper {
-  static TabItem item({int index}) {
-    switch (index) {
-      case 0:
-        return TabItem.list;
-      case 1:
-        return TabItem.chat;
-      case 2:
-        return TabItem.settings;
-    }
-    return TabItem.chat;
-  }
-
-  static String description(TabItem tabItem) {
-    switch (tabItem) {
-      case TabItem.list:
-        return 'LIST';
-      case TabItem.chat:
-        return 'CHAT';
-      case TabItem.settings:
-        return 'SETTINGS';
-    }
-    return '';
-  }
-
-  static String initialRoute(TabItem tabItem) {
-    switch (tabItem) {
-      case TabItem.list:
-        return Constants.koprRoute;
-      case TabItem.chat:
-        return Constants.chatRoute;
-      case TabItem.settings:
-        return Constants.settingsRoute;
-    }
-    return Constants.notFoundRoute;
-  }
-
-  static IconData icon(TabItem tabItem) {
-    switch (tabItem) {
-      case TabItem.list:
-        return Icons.format_list_bulleted;
-      case TabItem.chat:
-        return Icons.chat;
-      case TabItem.settings:
-        return Icons.settings;
-    }
-    return Icons.error;
-  }
-
-  static MaterialColor color(TabItem tabItem, BuildContext context) {
-    switch (tabItem) {
-      case TabItem.list:
-        return Theme.of(context).accentColor;
-      case TabItem.chat:
-        return Theme.of(context).accentColor;
-      case TabItem.settings:
-        return Theme.of(context).accentColor;
-    }
-    return Colors.grey;
-  }
-}
+import 'fancy_tab_item.dart';
 
 class FancyBottomNavigation extends StatefulWidget {
   final TabItem _selectedTab;
@@ -145,11 +80,11 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation>
     for (TabItem tabItem in TabItem.values) {
       fancyItems.add(FancyTabItem(
           selected: selectedTab == tabItem,
-          iconData: TabHelper.icon(tabItem),
-          title: TabHelper.description(tabItem),
+          iconData: TabHelper.getIcon(tabItem),
+          title: TabHelper.getDescription(tabItem),
           callbackFunction: () {
             setState(() {
-              nextIcon = TabHelper.icon(tabItem);
+              nextIcon = TabHelper.getIcon(tabItem);
               selectedTab = tabItem;
               widget.onTabChanged(tabItem);
             });
@@ -164,10 +99,12 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation>
         Container(
           height: 65,
           margin: EdgeInsets.only(top: 45),
-          decoration: BoxDecoration(color: Colors.white, boxShadow: [
-            BoxShadow(
-                color: Colors.black12, offset: Offset(0, -1), blurRadius: 8)
-          ]),
+          decoration: BoxDecoration(
+              color: Theme.of(context).bottomAppBarColor,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12, offset: Offset(0, -1), blurRadius: 8)
+              ]),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -196,7 +133,8 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation>
                                   width: 70,
                                   height: 70,
                                   decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color:
+                                          Theme.of(context).bottomAppBarColor,
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
@@ -210,7 +148,8 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation>
                         height: 70,
                         width: 90,
                         child: CustomPaint(
-                          painter: HalfPainter(),
+                          painter:
+                              HalfPainter(Theme.of(context).bottomAppBarColor),
                         )),
                     SizedBox(
                       height: 60,
@@ -220,7 +159,7 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation>
                             shape: BoxShape.circle,
                             color: Theme.of(context).accentColor,
                             border: Border.all(
-                                color: Colors.white,
+                                color: Theme.of(context).bottomAppBarColor,
                                 width: 5,
                                 style: BorderStyle.none)),
                         child: Padding(
@@ -270,6 +209,10 @@ class HalfClipper extends CustomClipper<Rect> {
 }
 
 class HalfPainter extends CustomPainter {
+  final Color paintColor;
+
+  HalfPainter(this.paintColor);
+
   @override
   void paint(Canvas canvas, Size size) {
     final Rect beforeRect = Rect.fromLTWH(0, (size.height / 2) - 10, 10, 10);
@@ -286,7 +229,7 @@ class HalfPainter extends CustomPainter {
     path.arcTo(afterRect, vector.radians(180), vector.radians(-90), false);
     path.close();
 
-    canvas.drawPath(path, Paint()..color = Colors.white);
+    canvas.drawPath(path, Paint()..color = paintColor);
   }
 
   @override
