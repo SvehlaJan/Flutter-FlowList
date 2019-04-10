@@ -24,8 +24,12 @@ abstract class FlowChatContent extends FlowChatState {
 
   FlowChatContent(this.messages) : super([messages]);
 
-  ChatState getLatestState() {
+  get latestState {
     return messages.isEmpty ? ChatState.WELCOME : messages.first.chatState;
+  }
+
+  get chatActions {
+    return messages.isEmpty ? List() : messages.first.chatActions;
   }
 }
 
@@ -39,12 +43,11 @@ class FlowChatTyping extends FlowChatContent {
 }
 
 class FlowChatMessages extends FlowChatContent {
-
   FlowChatMessages(List<ChatMessage> messages) : super(messages);
 
-  static FlowChatMessages welcome() => FlowChatMessages([ChatMessage.welcome()]);
+  static FlowChatMessages welcome() =>
+      FlowChatMessages([ChatMessage.welcome()]);
 
   @override
   String toString() => 'FlowChatMessages { messages: ${messages.length} }';
-
 }

@@ -6,7 +6,11 @@ import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 
 void main() async {
+  print("main.dart: main start");
   BlocSupervisor().delegate = SimpleBlocDelegate();
+  print("main.dart: main 1");
+  await Preferences.load();
+  print("main.dart: main 2");
   runApp(MainApp());
 }
 
@@ -18,38 +22,31 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> {
-  AppTheme appTheme;
+  AppTheme _appTheme;
 
   MainAppState();
 
   @override
   void initState() {
     super.initState();
-    initThemeAsync();
-  }
+    print("MainAppState: initState");
 
-  void initThemeAsync() async {
-    await Preferences.load();
     int appThemeIndex = Preferences.getInt(Preferences.KEY_SETTINGS_THEME) ?? 0;
-    AppTheme appTheme = AppTheme.values[appThemeIndex];
-    setAppTheme(appTheme);
+    _appTheme = AppTheme.values[appThemeIndex];
   }
 
   void setAppTheme(AppTheme newAppTheme) {
     setState(() {
-      appTheme = newAppTheme;
+      _appTheme = newAppTheme;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-//    if (appTheme == null) {
-//      return Scaffold(
-//        body: Center(child: Text('Splash Screen')),
-//      );
-//    }
+    print("MainAppState: build: Using theme: $_appTheme");
+
     ThemeData themeData;
-    if (appTheme == AppTheme.light) {
+    if (_appTheme == AppTheme.light) {
       themeData = ThemeData(
         brightness: Brightness.light,
         primaryColor: Colors.red,

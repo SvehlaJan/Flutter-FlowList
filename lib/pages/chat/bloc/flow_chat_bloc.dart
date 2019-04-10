@@ -80,7 +80,7 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
         }
       } else if (currentState is FlowChatMessages) {
         ChatState chatState =
-            (currentState as FlowChatMessages).getLatestState();
+            (currentState as FlowChatMessages).latestState;
         List<ChatMessage> messages =
             (currentState as FlowChatMessages).messages;
 

@@ -37,12 +37,12 @@ class FlowAppState extends State<FlowApp> {
     });
   }
 
-  bool _initialized = false;
+  bool _initialized = true;
 
   @override
   void initState() {
     super.initState();
-    initStateAsync();
+//    initStateAsync();
   }
 
   void initStateAsync() async {
@@ -55,6 +55,7 @@ class FlowAppState extends State<FlowApp> {
 
   @override
   Widget build(BuildContext context) {
+    print("FlowAppState: build: _initialized: $_initialized");
     if (!_initialized) {
       return Center(child: Text("Loading..."));
     }

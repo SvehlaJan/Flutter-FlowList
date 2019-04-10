@@ -1,15 +1,18 @@
 import 'dart:io';
-import 'package:flutter_flow_list/repositories/flow_repository.dart';
-import 'package:flutter_flow_list/util/constants.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/pages/base/stateful_page.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_bloc.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_state.dart';
-import 'package:flutter_flow_list/models/chat_message.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_flow_list/repositories/flow_repository.dart';
+import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FlowChatPage extends StatefulPage {
@@ -20,16 +23,15 @@ class FlowChatPage extends StatefulPage {
 }
 
 class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
-  final _scrollController = ScrollController();
   final FlowChatBloc _flowChatBloc = FlowChatBloc();
   final TextEditingController _inputController = new TextEditingController();
   final FocusNode _focusNode = new FocusNode();
   final FlowRepository _flowRepository = FlowRepository.get();
+  final UserRepository _userRepository = UserRepository.get();
 
   @override
   void initState() {
     super.initState();
-//    _scrollController.addListener(_onScroll);
     _flowChatBloc.dispatch(AppStarted());
     _focusNode.addListener(_onFocusChange);
     showContent();
@@ -53,112 +55,6 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
   @override
   String getPageTitle() {
     return 'Flow notes';
-  }
-
-  @override
-  Widget getContentView() {
-    return BlocBuilder(
-      bloc: _flowChatBloc,
-      builder: (BuildContext context, FlowChatState state) {
-        if (state is FlowChatLoading) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (state is FlowChatError) {
-          return Center(
-            child: Text(state.message),
-          );
-        }
-        if (state is FlowChatContent) {
-          if (state.messages.isEmpty) {
-            return Center(
-              child: Text('No messages'),
-            );
-          }
-//          _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-//              duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-          return _buildChatContent(context, state);
-        }
-      },
-    );
-  }
-
-  Widget _buildChatContent(BuildContext context, FlowChatContent state) {
-    return Column(children: <Widget>[
-      Flexible(
-        child: ListView.builder(
-          padding: EdgeInsets.all(4.0),
-          reverse: true,
-          itemBuilder: (BuildContext context, int index) {
-            if (state is FlowChatTyping && index == 0) {
-              return ChatTypingWidget();
-            } else {
-              return ChatMessageWidget(message: state.messages[index]);
-            }
-          },
-          itemCount: state.messages.length,
-          controller: _scrollController,
-        ),
-      ),
-      _buildChatInput(context, state)
-    ]);
-  }
-
-  Widget _buildChatInput(BuildContext context, FlowChatContent state) {
-    bool enabled = !(state is FlowChatTyping);
-    return Material(
-        elevation: 4,
-        color: Theme.of(context).cardColor,
-        child: Container(
-          child: Row(
-            children: <Widget>[
-              InkWell(
-                onTap: enabled ? () => _getImage(ImageSource.gallery) : null,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Icon(Icons.image,
-                      color: enabled
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).disabledColor),
-                ),
-              ),
-              Flexible(
-                child: TextField(
-                  textCapitalization: TextCapitalization.sentences,
-                  style: Theme.of(context).textTheme.body1,
-                  controller: _inputController,
-                  autofocus: false,
-                  textInputAction: TextInputAction.newline,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-                    border: InputBorder.none,
-                    hintText: 'Type your message...',
-                    hintStyle: Theme.of(context).textTheme.body1,
-                  ),
-                  focusNode: _focusNode,
-                ),
-              ),
-              InkWell(
-                onTap: enabled
-                    ? () => _onSendMessage(_inputController.text)
-                    : null,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Icon(Icons.send,
-                      color: enabled
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).disabledColor),
-                ),
-//                  onPressed: enabled
-//                      ? () => _onSendMessage(_inputController.text)
-//                      : null,
-              ),
-            ],
-          ),
-        ));
   }
 
   void _onSendMessage(String text, [MessageType type = MessageType.TEXT]) {
@@ -186,6 +82,121 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
       Fluttertoast.showToast(msg: 'This file is not an image');
     });
   }
+
+  @override
+  Widget getContentView() {
+    return BlocBuilder(
+      bloc: _flowChatBloc,
+      builder: (BuildContext context, FlowChatState state) {
+        if (state is FlowChatLoading) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is FlowChatError) {
+          return Center(
+            child: Text(state.message),
+          );
+        }
+        if (state is FlowChatContent) {
+          return _buildChatContent(context, state);
+        }
+      },
+    );
+  }
+
+  Widget _buildChatContent(BuildContext context, FlowChatContent state) {
+    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+      Expanded(
+        child: ListView.builder(
+          padding: EdgeInsets.all(12.0),
+          reverse: true,
+          itemBuilder: (BuildContext context, int index) {
+            if (state is FlowChatTyping && index == 0) {
+              return ChatTypingWidget();
+            } else {
+              return ChatMessageWidget(message: state.messages[index]);
+            }
+          },
+          itemCount: state.messages.length,
+//          controller: _scrollController,
+        ),
+      ),
+      _buildChatInput(context, state)
+    ]);
+  }
+
+  void _onChatActionClicked(ChatAction action) {
+    switch (action.type) {
+      case ChatActionType.TEXT:
+        // TODO: Handle this case.
+        break;
+      case ChatActionType.SKIP:
+        _onSendMessage(action.label);
+        break;
+      case ChatActionType.PHOTO:
+        _getImage(ImageSource.camera);
+        break;
+      case ChatActionType.GALERY:
+        _getImage(ImageSource.gallery);
+        break;
+    }
+  }
+
+  Widget _buildChatInput(BuildContext context, FlowChatContent state) {
+    bool enabled = !(state is FlowChatTyping);
+    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+      Container(
+        height: 40.0,
+        child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            itemBuilder: (context, index) {
+              ChatAction action = state.chatActions[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: ActionChip(
+                    label: action.label != null ? Text(action.label) : null,
+                    avatar: action.avatar != null ? Icon(action.avatar) : null,
+                    onPressed: () {
+                      _onChatActionClicked(action);
+                    }),
+              );
+            },
+            scrollDirection: Axis.horizontal,
+            itemCount: state.chatActions.length),
+      ),
+      Row(children: <Widget>[
+        Flexible(
+          child: TextField(
+            textCapitalization: TextCapitalization.sentences,
+            style: Theme.of(context).textTheme.body1,
+            controller: _inputController,
+            autofocus: false,
+            textInputAction: TextInputAction.newline,
+            maxLines: null,
+            decoration: InputDecoration(
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+              border: InputBorder.none,
+              hintText: 'Type your message...',
+              hintStyle: Theme.of(context).textTheme.body1,
+            ),
+            focusNode: _focusNode,
+          ),
+        ),
+        InkWell(
+          onTap: enabled ? () => _onSendMessage(_inputController.text) : null,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Icon(Icons.send,
+                color: enabled
+                    ? Theme.of(context).accentColor
+                    : Theme.of(context).disabledColor),
+          ),
+        ),
+      ])
+    ]);
+  }
 }
 
 class ChatMessageWidget extends StatelessWidget {
@@ -199,28 +210,18 @@ class ChatMessageWidget extends StatelessWidget {
         message != null && message.messageSender == MessageSender.USER;
     Widget body;
     if (message.type == MessageType.TEXT) {
-      body = ListTile(
-        leading: fromUser ? null : Icon(Icons.android),
-        trailing: fromUser ? Icon(Icons.person) : null,
-        title: Text(message.getMessageBody(),
-            style: Theme.of(context).textTheme.body1,
-            textAlign: fromUser ? TextAlign.end : TextAlign.start),
+      body = Align(
+        alignment: fromUser ? Alignment.centerRight : Alignment.centerLeft,
+        child:
+            Text(message.messageBody, style: Theme.of(context).textTheme.body1),
       );
     } else if (message.type == MessageType.IMAGE) {
-      double width = 200;
-      double height = 200;
-      body = Container(
+      body = Center(
           child: CachedNetworkImage(
-              placeholder: (context, url) => SizedBox(
-                    child: CircularProgressIndicator(),
-                    width: width,
-                    height: height,
-                  ),
+              placeholder: (context, url) => CircularProgressIndicator(),
               errorWidget: (context, url, error) => Icon(Icons.error),
               imageUrl: message.body,
-              width: width,
-              height: height,
-              fit: BoxFit.scaleDown));
+              fit: BoxFit.fill));
     }
     return ChatBubble(message: message, child: body);
   }
@@ -231,10 +232,8 @@ class ChatTypingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChatBubble(
         message: null,
-        child: ListTile(
-          leading: Icon(Icons.android),
-          title: Text("..."),
-        ));
+        child: SpinKitThreeBounce(
+            color: Theme.of(context).textTheme.body1.color, size: 24.0));
   }
 }
 
@@ -264,18 +263,58 @@ class ChatBubble extends Container {
             bottomRight: Radius.circular(10.0),
           );
 
-    return Container(
-        child: child,
-        margin: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                blurRadius: .5,
-                spreadRadius: 1.0,
-                color: Colors.black.withOpacity(.12))
-          ],
-          color: bg,
-          borderRadius: radius,
-        ));
+    Widget avatar;
+    if (fromUser && UserRepository.get().isSignedIn()) {
+      avatar = ClipOval(
+        child: CachedNetworkImage(
+          width: Constants.avatarImageSize,
+          height: Constants.avatarImageSize,
+          placeholder: (context, url) => CircularProgressIndicator(),
+          errorWidget: (context, url, error) => Icon(Icons.error),
+          imageUrl: UserRepository.get().getPhotoUrl() ?? "",
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      avatar = Container(
+        width: Constants.avatarImageSize,
+        height: Constants.avatarImageSize,
+        child: avatar = fromUser
+            ? Icon(Icons.person,
+                color: Theme.of(context).primaryIconTheme.color)
+            : Icon(Icons.android,
+                color: Theme.of(context).primaryIconTheme.color),
+        decoration: ShapeDecoration(
+            shape: CircleBorder(), color: Theme.of(context).accentColor),
+      );
+    }
+
+    return Row(
+      children: <Widget>[
+        fromUser ? Container(width: Constants.avatarImageSize) : avatar,
+        Expanded(
+          child: Container(
+              child: ConstrainedBox(
+                  constraints:
+                      BoxConstraints(minHeight: Constants.chatBubbleHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: child,
+                  )),
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: .5,
+                      spreadRadius: 1.0,
+                      color: Colors.black.withOpacity(.12))
+                ],
+                color: bg,
+                borderRadius: radius,
+              )),
+        ),
+        fromUser ? avatar : Container(width: Constants.avatarImageSize),
+      ],
+    );
   }
 }
