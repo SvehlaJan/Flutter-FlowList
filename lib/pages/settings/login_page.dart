@@ -52,8 +52,9 @@ class _LoginPageState extends State<LoginPage> {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      final FirebaseUser user =
+      final AuthResult authResult =
           await _firebaseAuth.signInWithCredential(credential);
+      final FirebaseUser user = authResult.user;
 
       assert(user.email != null);
       assert(user.displayName != null);
@@ -73,8 +74,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _logInFirebaseWithEmail(String email, String password) async {
     try {
-      final FirebaseUser user = await _firebaseAuth.signInWithEmailAndPassword(
+      final AuthResult authResult = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
+      final FirebaseUser user = authResult.user;
+
       assert(user.email != null);
       assert(user.displayName != null);
       assert(!user.isAnonymous);

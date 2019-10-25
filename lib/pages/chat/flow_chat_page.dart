@@ -10,9 +10,10 @@ import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_state.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/ui/chat_action_animated_list.dart';
+import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FlowChatPage extends StatefulPage {
@@ -23,15 +24,17 @@ class FlowChatPage extends StatefulPage {
 }
 
 class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
-  final FlowChatBloc _flowChatBloc = FlowChatBloc();
+  FlowChatBloc _flowChatBloc;
   final TextEditingController _inputController = new TextEditingController();
   final FocusNode _focusNode = new FocusNode();
   final FlowRepository _flowRepository = FlowRepository.get();
   final UserRepository _userRepository = UserRepository.get();
+  AnimatedChatActionList _chatActionList;
 
   @override
   void initState() {
     super.initState();
+    _flowChatBloc = BlocProvider.of<FlowChatBloc>(context);
     _flowChatBloc.dispatch(AppStarted());
     _focusNode.addListener(_onFocusChange);
     showContent();
@@ -79,7 +82,8 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
     _flowRepository.uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
       _onSendMessage(downloadUrl, MessageType.IMAGE);
     }, onError: (err) {
-      Fluttertoast.showToast(msg: 'This file is not an image');
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text("This file is not an image")));
     });
   }
 
@@ -101,6 +105,7 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
         if (state is FlowChatContent) {
           return _buildChatContent(context, state);
         }
+        return getEmptyView();
       },
     );
   }
@@ -119,7 +124,6 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
             }
           },
           itemCount: state.messages.length,
-//          controller: _scrollController,
         ),
       ),
       _buildChatInput(context, state)
@@ -129,7 +133,7 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
   void _onChatActionClicked(ChatAction action) {
     switch (action.type) {
       case ChatActionType.TEXT:
-        // TODO: Handle this case.
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Test")));
         break;
       case ChatActionType.SKIP:
         _onSendMessage(action.label);
@@ -148,22 +152,23 @@ class _FlowChatPageState extends StatefulPageState<FlowChatPage> {
     return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
       Container(
         height: 40.0,
-        child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            itemBuilder: (context, index) {
-              ChatAction action = state.chatActions[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: ActionChip(
-                    label: action.label != null ? Text(action.label) : null,
-                    avatar: action.avatar != null ? Icon(action.avatar) : null,
-                    onPressed: () {
-                      _onChatActionClicked(action);
-                    }),
-              );
-            },
-            scrollDirection: Axis.horizontal,
-            itemCount: state.chatActions.length),
+        child: AnimatedChatActionList(onActionTap: _onChatActionClicked, actions: state.chatActions),
+//        child: ListView.builder(
+//            padding: EdgeInsets.symmetric(horizontal: 8.0),
+//            itemBuilder: (context, index) {
+//              ChatAction action = state.chatActions[index];
+//              return Padding(
+//                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+//                child: ActionChip(
+//                    label: action.label != null ? Text(action.label) : null,
+//                    avatar: action.avatar != null ? Icon(action.avatar) : null,
+//                    onPressed: () {
+//                      _onChatActionClicked(action);
+//                    }),
+//              );
+//            },
+//            scrollDirection: Axis.horizontal,
+//            itemCount: state.chatActions.length),
       ),
       Row(children: <Widget>[
         Flexible(

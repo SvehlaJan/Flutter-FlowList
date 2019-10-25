@@ -31,35 +31,8 @@ class FlowAppState extends State<FlowApp> {
     });
   }
 
-  void _selectTab(TabItem tabItem) {
-    setState(() {
-      currentTab = tabItem;
-    });
-  }
-
-  bool _initialized = true;
-
-  @override
-  void initState() {
-    super.initState();
-//    initStateAsync();
-  }
-
-  void initStateAsync() async {
-    await Preferences.load();
-
-    setState(() {
-      _initialized = true;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    print("FlowAppState: build: _initialized: $_initialized");
-    if (!_initialized) {
-      return Center(child: Text("Loading..."));
-    }
-
     return WillPopScope(
       onWillPop: () async =>
           !await navigatorKeys[currentTab].currentState.maybePop(),

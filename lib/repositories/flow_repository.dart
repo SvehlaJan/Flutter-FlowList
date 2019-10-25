@@ -88,6 +88,6 @@ class FlowRepository {
     print("Resizing image with width: ${sourceImage.width}, height: ${sourceImage.height} to max size: $maxSize");
     int targetWidth = sourceImage.width > sourceImage.height ? maxSize : -1;
     int targetHeight = sourceImage.width > sourceImage.height ? -1 : maxSize;
-    return copyResize(sourceImage, targetWidth, targetHeight);
+    return copyResize(sourceImage, width: targetWidth, height: targetHeight);
   }
 }

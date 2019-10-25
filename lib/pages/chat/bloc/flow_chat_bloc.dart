@@ -8,7 +8,6 @@ import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
-import 'package:rxdart/rxdart.dart';
 
 class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
   FlowRepository _flowRepository = FlowRepository.get();
@@ -45,12 +44,6 @@ class FlowChatBloc extends Bloc<FlowChatEvent, FlowChatState> {
     } else {
       dispatch(TypingStart());
     }
-  }
-
-  @override
-  Stream<FlowChatEvent> transform(Stream<FlowChatEvent> events) {
-    return (events as Observable<FlowChatEvent>)
-        .debounce(Duration(milliseconds: 100));
   }
 
   @override

@@ -20,35 +20,32 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_bloc: ^0.9.1
-#  kt_dart: ^0.5.0
-  equatable: ^0.2.3
+  flutter_bloc: ^0.21.0
+  #  kt_dart: ^0.5.0
+  equatable: ^0.5.1
   cupertino_icons: ^0.1.2
 
-  flutter_crashlytics: ^0.2.1+1
-  flutter_local_notifications: ^0.5.2
+  flutter_crashlytics: ^1.0.0
+  flutter_local_notifications: ^0.8.3
 
-  firebase_analytics: ^2.0.3
+  firebase_analytics: ^5.0.2
 #  firebase_database: ^2.0.2
-  firebase_auth: ^0.8.3
-  firebase_storage: 2.1.0+1
-  cloud_firestore: 0.9.7
+  firebase_auth: ^0.14.0+5
+  firebase_storage: ^3.0.6
+  cloud_firestore: ^0.12.9+4
 
-#  google_api_availability: ^2.0.0
-  google_sign_in: ^4.0.1+1
+  #  google_api_availability: ^2.0.0
+  google_sign_in: ^4.0.7
 
-  shared_preferences: ^0.5.1+1
+  shared_preferences: ^0.5.3+4
   date_format: ^1.0.6
-#  flutter_date_picker: ^0.1.8
-  flutter_cupertino_date_picker: ^0.3.0
 
-  image: ^2.0.7
-  cached_network_image: ^0.7.0
-  intl: ^0.15.8
-  fluttertoast: ^3.0.3
-  image_picker: 0.5.1
-  flutter_picker: ^1.0.10
-  flutter_spinkit: ^3.1.0
+  image: ^2.1.4
+  cached_network_image: ^1.1.1
+  intl: ^0.16.0
+  image_picker: 0.6.1+4
+  flutter_picker: ^1.0.15
+  flutter_spinkit: ^4.0.0
 
 dev_dependencies:
   flutter_test:

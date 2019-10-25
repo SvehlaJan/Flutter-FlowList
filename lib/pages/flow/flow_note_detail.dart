@@ -3,13 +3,12 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/base/stateful_page.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/util/date_picker_adapter.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 
@@ -26,7 +25,6 @@ class FlowNoteDetailPage extends StatefulPage {
 
 class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
     with TickerProviderStateMixin {
-//  DateTime _selectedDate;
   FlowRecord _flowRecord;
 
   TextEditingController _entry1ValueController;
@@ -87,19 +85,18 @@ class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
   }
 
   void _onDateClicked() {
-    DatePicker.showDatePicker(
-      context,
-      showTitleActions: true,
-      locale: 'en',
-      minYear: 2000,
-      maxYear: DateTime.now().year,
-      initialYear: _flowRecord.dateTime.year,
-      initialMonth: _flowRecord.dateTime.month,
-      initialDate: _flowRecord.dateTime.day,
-      onConfirm: (year, month, date) {
-        _setSelectedDate(new DateTime(year, month, date));
-      },
-    );
+    DateTime today = DateTime.now();
+    Picker(
+        hideHeader: true,
+        adapter: DatePickerAdapter(
+            value: _flowRecord.dateTime,
+            dayMax: today.day,
+            monthMax: today.month,
+            yearMax: today.year),
+        title: Text("Select Date"),
+        onConfirm: (Picker picker, List value) {
+          _setSelectedDate((picker.adapter as DatePickerAdapter).value);
+        }).showDialog(context);
   }
 
   void _onDeleteClicked() {
@@ -135,7 +132,7 @@ class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
 
   void _onRatingClicked() {
     List<int> values = new List<int>.generate(10, (i) => i + 1);
-    new Picker(
+    Picker(
         adapter: PickerDataAdapter<String>(pickerdata: values),
         changeToFirst: true,
         hideHeader: false,
@@ -144,7 +141,7 @@ class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
               int.parse(picker.getSelectedValues().first.toString());
           print(_flowRecord.dayScore.toString());
           showContent(force: true);
-        }).showModal(this.context); //_scaffoldKey.currentState);
+        }).showModal(context); //_scaffoldKey.currentState);
   }
 
   void _onFavoriteClicked(int index) {
@@ -171,7 +168,7 @@ class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
       _flowRecord.imageUrl = downloadUrl;
       showContent();
     }, onError: (err) {
-      Fluttertoast.showToast(msg: 'This file is not an image');
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text("This file is not an image")));
     });
   }
 
@@ -210,9 +207,9 @@ class _FlowNoteDetailPageState extends StatefulPageState<FlowNoteDetailPage>
             children: <Widget>[
               ConstrainedBox(
                 constraints: BoxConstraints(
-                    minWidth: double.infinity,
-                    minHeight: 240.0,
-                    ),
+                  minWidth: double.infinity,
+                  minHeight: 240.0,
+                ),
                 child: Center(
                   child: CachedNetworkImage(
                     placeholder: (context, url) => CircularProgressIndicator(),

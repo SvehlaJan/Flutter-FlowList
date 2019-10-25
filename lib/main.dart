@@ -1,13 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_flow_list/app.dart';
+import 'package:flutter_flow_list/bloc/main_bloc.dart';
 import 'package:flutter_flow_list/bloc/simple_bloc_delegate.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 
 void main() async {
   print("main.dart: main start");
-  BlocSupervisor().delegate = SimpleBlocDelegate();
+  BlocSupervisor.delegate = SimpleBlocDelegate();
   print("main.dart: main 1");
   await Preferences.load();
   print("main.dart: main 2");
@@ -73,10 +75,12 @@ class MainAppState extends State<MainApp> {
             ),
       );
     }
-    return MaterialApp(
+    return BlocProvider(
+      builder: (context) => MainBloc(),
+        child: MaterialApp(
       title: 'FlowList',
       theme: themeData,
       home: FlowApp(),
-    );
+    ));
   }
 }
