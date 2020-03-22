@@ -4,8 +4,8 @@ import 'package:flutter_flow_list/navigation/tab_helper.dart';
 import 'package:flutter_flow_list/pages/base/notfound_page.dart';
 import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_bloc.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_page.dart';
-import 'package:flutter_flow_list/pages/flow/flow_note_detail.dart';
-import 'package:flutter_flow_list/pages/flow/flow_notes_list.dart';
+import 'package:flutter_flow_list/pages/flow/record_detail_page.dart';
+import 'package:flutter_flow_list/pages/flow/records_list_page.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';
 import 'package:flutter_flow_list/pages/settings/settings_page.dart';
 import 'package:flutter_flow_list/util/constants.dart';
@@ -31,21 +31,21 @@ class TabNavigator extends StatelessWidget {
         return MaterialPageRoute<void>(
             settings: settings,
             builder: (BuildContext context) => BlocProvider(
-                builder: (context) => FlowChatBloc(), child: FlowChatPage()));
-      case Constants.koprRoute:
+                create: (context) => FlowChatBloc(), child: FlowChatPage()));
+      case Constants.recordsListRoute:
         return MaterialPageRoute<void>(
             settings: settings,
-            builder: (BuildContext context) => FlowNotesListPage());
-      case Constants.koprAddRoute:
+            builder: (BuildContext context) => RecordsListPage());
+      case Constants.recordDetailRoute:
         String date;
         if (arguments != null &&
-            arguments.containsKey(FlowNoteDetailPage.ARG_DATE)) {
-          date = arguments[FlowNoteDetailPage.ARG_DATE];
+            arguments.containsKey(RecordDetailPage.ARG_DATE)) {
+          date = arguments[RecordDetailPage.ARG_DATE];
         }
         return MaterialPageRoute<void>(
             settings: settings,
             builder: (BuildContext context) =>
-                FlowNoteDetailPage(initDateString: date));
+                RecordDetailPage(initDateString: date));
       case Constants.settingsRoute:
         return MaterialPageRoute<void>(
             settings: settings,

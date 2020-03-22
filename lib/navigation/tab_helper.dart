@@ -9,7 +9,10 @@ class TabHelper {
     for (TabItem tabItem in TabItem.values) {
       items.add(BottomNavigationBarItem(
           icon: Icon(getIcon(tabItem)),
-          title: Text(getDescription(tabItem), style: Theme.of(context).textTheme.body1,)));
+          title: Text(
+            getDescription(tabItem),
+            style: Theme.of(context).textTheme.bodyText1,
+          )));
     }
     return items;
   }
@@ -41,7 +44,7 @@ class TabHelper {
   static String getInitialRoute(TabItem tabItem) {
     switch (tabItem) {
       case TabItem.list:
-        return Constants.koprRoute;
+        return Constants.recordsListRoute;
       case TabItem.chat:
         return Constants.chatRoute;
       case TabItem.settings:

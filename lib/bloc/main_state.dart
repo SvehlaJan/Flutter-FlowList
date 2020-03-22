@@ -3,7 +3,10 @@ import 'package:meta/meta.dart';
 
 @immutable
 abstract class MainState extends Equatable {
-  MainState([List props = const []]) : super(props);
+  MainState([List props = const []]);
+
+  @override
+  List<Object> get props => [];
 }
 
 class Uninitialized extends MainState {

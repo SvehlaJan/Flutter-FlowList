@@ -19,39 +19,52 @@ class FlowRecord {
   String imageUrl;
   int favoriteEntry;
   int dayScore;
+  DateTime dateModified;
 
-  FlowRecord(this.dateTime,
-      {this.firstEntry,
-      this.secondEntry,
-      this.thirdEntry,
-      this.imageUrl,
-      this.favoriteEntry,
-      this.dayScore});
+  FlowRecord(this.dateTime, this.firstEntry, this.secondEntry, this.thirdEntry, this.imageUrl, this.favoriteEntry, this.dayScore, this.dateModified);
 
-  static FlowRecord withDateStr(String date,
-      {String firstEntry,
-      String secondEntry,
-      String thirdEntry,
-      String imageUrl,
-      int favoriteEntry,
-      int dayScore}) {
-    return new FlowRecord(DateTime.parse(date),
-        firstEntry: firstEntry,
-        secondEntry: secondEntry,
-        thirdEntry: thirdEntry,
-        imageUrl: imageUrl,
-        favoriteEntry: favoriteEntry,
-        dayScore: dayScore);
+  String get apiDateStr => apiDateString(dateTime);
+
+  bool get isSaved => dateModified != null;
+
+  static FlowRecord withDateStr(String date, {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
+    return new FlowRecord(DateTime.parse(date), firstEntry, secondEntry, thirdEntry, imageUrl, favoriteEntry, dayScore, dateModified);
   }
 
-  static FlowRecord fromSnapShot(DocumentSnapshot document) {
-    return FlowRecord(DateTime.parse(document.documentID),
-        firstEntry: document[FlowRecord.KEY_ENTRY_1],
-        secondEntry: document[FlowRecord.KEY_ENTRY_2],
-        thirdEntry: document[FlowRecord.KEY_ENTRY_3],
-        imageUrl: document[FlowRecord.KEY_IMAGE_URL],
-        favoriteEntry: document[FlowRecord.KEY_FAVORITE_ENTRY] ?? -1,
-        dayScore: document[FlowRecord.KEY_DAY_SCORE]);
+  factory FlowRecord.withDateTime(DateTime dateTime,
+      {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
+    return FlowRecord(dateTime, firstEntry, secondEntry, thirdEntry, imageUrl, favoriteEntry, dayScore, dateModified);
+  }
+
+  Map<String, dynamic> toMap() => {
+        FlowRecord.KEY_ENTRY_1: firstEntry,
+        FlowRecord.KEY_ENTRY_2: secondEntry,
+        FlowRecord.KEY_ENTRY_3: thirdEntry,
+        FlowRecord.KEY_IMAGE_URL: imageUrl,
+        FlowRecord.KEY_FAVORITE_ENTRY: favoriteEntry,
+        FlowRecord.KEY_DAY_SCORE: dayScore,
+        FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String(),
+      };
+
+  factory FlowRecord.fromDocumentSnapshot(DocumentSnapshot snapshot) {
+    if (snapshot.data != null) {
+      String dateStr = snapshot.documentID ?? "";
+      DateTime dateTime = DateTime.parse(dateStr);
+      String dateModifiedStr = snapshot.data[FlowRecord.KEY_DATE_MODIFIED] ?? "";
+      DateTime dateTimeModified = DateTime.parse(dateModifiedStr);
+      return FlowRecord(
+        dateTime,
+        snapshot.data[FlowRecord.KEY_ENTRY_1] ?? "",
+        snapshot.data[FlowRecord.KEY_ENTRY_2] ?? "",
+        snapshot.data[FlowRecord.KEY_ENTRY_3] ?? "",
+        snapshot.data[FlowRecord.KEY_IMAGE_URL],
+        snapshot.data[FlowRecord.KEY_FAVORITE_ENTRY] ?? -1,
+        snapshot.data[FlowRecord.KEY_DAY_SCORE],
+        dateTimeModified,
+      );
+    } else {
+      return null;
+    }
   }
 
   static String apiDateString(DateTime dateTime) {
@@ -59,8 +72,7 @@ class FlowRecord {
   }
 
   static String apiDateStringLong(DateTime dateTime) {
-    return formatDate(
-        dateTime, [yyyy, '-', mm, '-', dd, '_', HH, ':', nn, ':', ss]);
+    return formatDate(dateTime, [yyyy, '-', mm, '-', dd, '_', HH, ':', nn, ':', ss]);
   }
 
   static String userDateString(DateTime dateTime) {

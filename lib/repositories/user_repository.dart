@@ -1,13 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_flow_list/models/flow_record.dart';
-import 'package:flutter_flow_list/util/constants.dart';
-import 'package:flutter_flow_list/util/preferences.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_flow_list/locator.dart';
+import 'package:flutter_flow_list/models/user_model.dart';
+import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class UserRepository {
-  static final UserRepository _repo = new UserRepository._internal();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
+
+class UserRepository with ChangeNotifier {
+  FirebaseAuth _firebaseAuth;
+  FirebaseUser _firebaseUser;
+  Status _status = Status.Uninitialized;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>[
       'email',
@@ -15,74 +21,88 @@ class UserRepository {
     ],
   );
 
-  static UserRepository get() {
-    return _repo;
+  StreamController<FlowUser> _onUserChangeController = StreamController.broadcast();
+
+  Stream<FlowUser> get userStream => _onUserChangeController.stream;
+
+  UserRepository.instance() : _firebaseAuth = FirebaseAuth.instance {
+    _firebaseAuth.onAuthStateChanged.listen(_onAuthStateChanged);
   }
 
-  UserRepository._internal() {
-    // initialization code
+  Status get status => _status;
+
+  FlowUser get currentUser => FlowUser.fromFirebase(_firebaseUser);
+
+  bool get isLoggedIn => _status == Status.Authenticated;
+
+  String getPhotoUrl() => _firebaseUser.photoUrl;
+
+  Future<bool> signInWithEmail(String email, String password) async {
+    try {
+      _status = Status.Authenticating;
+      notifyListeners();
+      await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      return true;
+    } catch (e) {
+      _status = Status.Unauthenticated;
+      notifyListeners();
+      return false;
+    }
   }
 
-  Future<FirebaseUser> signIn() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    await _auth.signInWithCredential(credential);
-    FirebaseUser firebaseUser = await _auth.currentUser();
-    await _onSuccess(firebaseUser);
-
-    return firebaseUser;
+  Future<bool> signInWithGoogle() async {
+    try {
+      _status = Status.Authenticating;
+      notifyListeners();
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+      return true;
+    } catch (e) {
+      print(e);
+      _status = Status.Unauthenticated;
+      notifyListeners();
+      return false;
+    }
   }
 
-  Future<bool> isSignedInAsync() {
-    return _googleSignIn.isSignedIn();
-  }
-  
-  bool isSignedIn() {
-    return Preferences.getString(Preferences.KEY_USER_UID) != null;
-  }
+  Future<bool> signInAnonymously() async {
+    try {
+      _status = Status.Authenticating;
+      notifyListeners();
 
-  Future<void> signOut() async {
-    await _auth.signOut();
-    await _googleSignIn.signOut();
-    
-    await Preferences.load();
-    Preferences.setString(Preferences.KEY_USER_UID, null);
-    Preferences.setString(Preferences.KEY_USER_EMAIL, null);
-    Preferences.setString(Preferences.KEY_USER_NICK_NAME, null);
-    Preferences.setString(Preferences.KEY_USER_PHOTO_URL, null);
+      await _firebaseAuth.signInAnonymously();
+      return true;
+    } on PlatformException catch (e) {
+      print(e);
+
+      _status = Status.Unauthenticated;
+      notifyListeners();
+      return false;
+    }
   }
 
-  String getUserName() {
-    return Preferences.getString(Preferences.KEY_USER_NICK_NAME);
+  Future signOut() async {
+    _firebaseAuth.signOut();
+    _status = Status.Unauthenticated;
+    notifyListeners();
+    return Future.delayed(Duration.zero);
   }
 
-  String getPhotoUrl() {
-    return Preferences.getString(Preferences.KEY_USER_PHOTO_URL);
-  }
+  Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
+    _onUserChangeController.add(FlowUser.fromFirebase(firebaseUser));
 
-  Future<void> _onSuccess(FirebaseUser firebaseUser) async {
-    await Firestore.instance
-        .collection(Constants.FIRESTORE_USERS)
-        .document(firebaseUser.uid)
-        .setData({
-      Constants.FIRESTORE_ID: firebaseUser.uid,
-      Constants.FIRESTORE_PROVIDER_ID: firebaseUser.providerId,
-      Constants.FIRESTORE_NICKNAME: firebaseUser.displayName,
-      Constants.FIRESTORE_EMAIL: firebaseUser.email,
-      Constants.FIRESTORE_PHOTO_URL: firebaseUser.photoUrl,
-    });
-
-    await Preferences.load();
-    Preferences.setString(Preferences.KEY_USER_UID, firebaseUser.uid);
-    Preferences.setString(Preferences.KEY_USER_EMAIL, firebaseUser.email);
-    Preferences.setString(
-        Preferences.KEY_USER_NICK_NAME, firebaseUser.displayName);
-    Preferences.setString(
-        Preferences.KEY_USER_PHOTO_URL, firebaseUser.photoUrl);
+    if (firebaseUser == null) {
+      _status = Status.Unauthenticated;
+    } else {
+      _firebaseUser = firebaseUser;
+      getIt<FlowRepository>().setUserId(firebaseUser.uid);
+      _status = Status.Authenticated;
+    }
+    notifyListeners();
   }
 }

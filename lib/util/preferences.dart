@@ -4,6 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
  * https://gist.github.com/faisalraja/9b628439978c67b2fb6515cf202a3992
  */
 class Preferences {
+  static final Preferences _instance = Preferences._internal();
+  static bool _initialized = false;
+
   static const String KEY_USER_UID = "user_uid";
   static const String KEY_USER_NICK_NAME = "user_nick_name";
   static const String KEY_USER_EMAIL = "user_email";
@@ -13,11 +16,22 @@ class Preferences {
   static SharedPreferences _prefs;
   static Map<String, dynamic> _memoryPrefs = Map<String, dynamic>();
 
-  static Future<SharedPreferences> load() async {
-    if (_prefs == null) {
-      _prefs = await SharedPreferences.getInstance();
-    }
-    return _prefs;
+  Preferences._internal() {
+    // initialization code
+  }
+
+  static Preferences getSync() {
+    if (!_initialized) throw Exception("Cache must be initialized at first!");
+    return _instance;
+  }
+
+  static Future<Preferences> initAndGet() async {
+    if (_initialized) return _instance;
+
+    _prefs = await SharedPreferences.getInstance();
+
+    _initialized = true;
+    return _instance;
   }
 
   static void setString(String key, String value) {

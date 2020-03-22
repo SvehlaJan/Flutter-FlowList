@@ -15,7 +15,7 @@ class ChatAction {
   ChatAction(this.type);
 
   get label {
-    switch(type) {
+    switch (type) {
       case ChatActionType.TEXT:
         return "Text";
       case ChatActionType.SKIP:
@@ -29,7 +29,7 @@ class ChatAction {
   }
 
   get avatar {
-    switch(type) {
+    switch (type) {
       case ChatActionType.TEXT:
         return null;
       case ChatActionType.SKIP:
@@ -49,12 +49,10 @@ class ChatMessage extends Equatable {
   final String body;
   final MessageType type;
 
-  ChatMessage(
-      {this.chatState,
-      this.messageSender,
-      this.body,
-      this.type = MessageType.TEXT})
-      : super([chatState, messageSender, body, type]);
+  @override
+  List<Object> get props => [chatState, messageSender, body, type];
+
+  ChatMessage({this.chatState, this.messageSender, this.body, this.type = MessageType.TEXT});
 
   ChatMessage.welcome()
       : chatState = ChatState.WELCOME,

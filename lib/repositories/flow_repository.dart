@@ -1,75 +1,46 @@
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
-import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/repositories/api.dart';
+import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 import 'package:image/image.dart';
 
-class FlowRepository {
-  static final FlowRepository _repo = new FlowRepository._internal();
+class FlowRepository extends ChangeNotifier {
+  Api _api;
 
-  static FlowRepository get() {
-    return _repo;
+  FlowRepository.instance() {
+    _api = getIt<Api>();
   }
 
-  FlowRepository._internal() {
-    // initialization code
-    // todo - get temporary userId from firebase
-//    init();
+  void setUserId(String userId) => _api.setUserId(userId);
+
+  Stream<List<FlowRecord>> streamFlowRecords() {
+    return _api.streamDataCollection().map((list) => list.documents.map((doc) => FlowRecord.fromDocumentSnapshot(doc)).toList());
   }
 
-  Future<void> init() async {
-    await Preferences.load();
-  }
-
-  CollectionReference _getFirestoreReference() {
-    String userId = Preferences.getString(Preferences.KEY_USER_UID);
-    return Firestore.instance
-        .collection(Constants.FIRESTORE_USERS)
-        .document(userId)
-        .collection(Constants.FIRESTORE_FLOW_NOTES);
-  }
-
-  Future<DocumentSnapshot> getFlowRecord([DateTime dateTime]) async {
-    dateTime = dateTime ?? DateTime.now();
-    String dateStr = FlowRecord.apiDateString(dateTime);
-    DocumentReference dayReference = _getFirestoreReference().document(dateStr);
-    return dayReference.get();
-  }
-
-  Stream<QuerySnapshot> getFlowRecords() {
-    return _getFirestoreReference().snapshots();
-  }
-
-  Future<void> setFlowRecord(FlowRecord flowRecord) async {
-    DocumentReference dayReference =
-        _getFirestoreReference().document(flowRecord.getApiDateString());
-
-    return dayReference.setData({
-      FlowRecord.KEY_ENTRY_1: flowRecord.firstEntry,
-      FlowRecord.KEY_ENTRY_2: flowRecord.secondEntry,
-      FlowRecord.KEY_ENTRY_3: flowRecord.thirdEntry,
-      FlowRecord.KEY_IMAGE_URL: flowRecord.imageUrl,
-      FlowRecord.KEY_DAY_SCORE: flowRecord.dayScore,
-      FlowRecord.KEY_FAVORITE_ENTRY: flowRecord.favoriteEntry,
-      FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String(),
-    });
+  Future<FlowRecord> getFlowRecord(DateTime dateTime) async {
+    return FlowRecord.fromDocumentSnapshot(await _api.getDocumentById(FlowRecord.apiDateString(dateTime))) ?? FlowRecord.withDateTime(dateTime);
   }
 
   Future<void> deleteFlowRecord(DateTime dateTime) async {
-    String dateStr = FlowRecord.apiDateString(dateTime);
-    DocumentReference dayReference = _getFirestoreReference().document(dateStr);
-    return dayReference.delete();
+    String dateStr = formatDate(dateTime, [yyyy, '-', mm, '-', dd]);
+    return _api.removeDocument(dateStr);
+  }
+
+  Future<void> updateFlowRecord(FlowRecord flowRecord) async {
+    return _api.updateDocument(flowRecord.toMap(), flowRecord.apiDateStr);
   }
 
   Future<dynamic> uploadImage(File sourceFile, DateTime dateTime) async {
     int fileSize = await sourceFile.length();
     print("Going to upload image file: ${sourceFile.path} with size: ${fileSize / 1024.0} KB");
 
-    String userId = Preferences.getString(Preferences.KEY_USER_UID) ?? "_";
+    String userId = getIt<UserRepository>().currentUser.id;
     String fileName = userId + " " + FlowRecord.apiDateStringLong(dateTime);
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
 

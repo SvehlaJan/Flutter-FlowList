@@ -2,12 +2,15 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
 
 abstract class FlowChatState extends Equatable {
-  FlowChatState([List props = const []]) : super(props);
+  FlowChatState();
 }
 
 class FlowChatLoading extends FlowChatState {
   @override
   String toString() => 'FlowChatLoading';
+
+  @override
+  List<Object> get props => [];
 }
 
 class FlowChatError extends FlowChatState {
@@ -17,12 +20,15 @@ class FlowChatError extends FlowChatState {
 
   @override
   String toString() => 'FlowChatError';
+
+  @override
+  List<Object> get props => [message];
 }
 
 abstract class FlowChatContent extends FlowChatState {
   final List<ChatMessage> messages;
 
-  FlowChatContent(this.messages) : super([messages]);
+  FlowChatContent(this.messages);
 
   get latestState {
     return messages.isEmpty ? ChatState.WELCOME : messages.first.chatState;
@@ -31,6 +37,9 @@ abstract class FlowChatContent extends FlowChatState {
   get chatActions {
     return messages.isEmpty ? List() : messages.first.chatActions;
   }
+
+  @override
+  List<Object> get props => [messages];
 }
 
 class FlowChatTyping extends FlowChatContent {

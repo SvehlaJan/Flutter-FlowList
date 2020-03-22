@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/navigation/tab_helper.dart';
 import 'package:flutter_flow_list/navigation/tab_navigator.dart';
-import 'package:flutter_flow_list/util/preferences.dart';
 
 class FlowApp extends StatefulWidget {
   @override
@@ -34,8 +33,7 @@ class FlowAppState extends State<FlowApp> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async =>
-          !await navigatorKeys[currentTab].currentState.maybePop(),
+      onWillPop: () async => !await navigatorKeys[currentTab].currentState.maybePop(),
       child: Scaffold(
         body: Stack(children: <Widget>[
           _buildOffstageNavigator(TabItem.list),
@@ -52,10 +50,6 @@ class FlowAppState extends State<FlowApp> {
           currentIndex: currentTab.index,
           onTap: _selectTabIndex,
         ),
-//        bottomNavigationBar: FancyBottomNavigation(
-//          currentTab,
-//          onTabChanged: _selectTab,
-//        ),
       ),
     );
   }
