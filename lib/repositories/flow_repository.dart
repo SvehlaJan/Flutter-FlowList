@@ -2,15 +2,13 @@ import 'dart:io';
 
 import 'package:date_format/date_format.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/repositories/api.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
-import 'package:flutter_flow_list/util/preferences.dart';
 import 'package:image/image.dart';
 
-class FlowRepository extends ChangeNotifier {
+class FlowRepository {
   Api _api;
 
   FlowRepository.instance() {

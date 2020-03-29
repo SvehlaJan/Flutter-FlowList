@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-enum ChatState { WELCOME, ENTRY_1, ENTRY_2, ENTRY_3, PICTURE }
+enum ChatStage { WELCOME, ENTRY_1, ENTRY_2, ENTRY_3, PICTURE, GIF, FINISHED }
 
-enum ChatActionType { TEXT, SKIP, PHOTO, GALERY }
+enum ChatActionType { TEXT, SKIP, PHOTO, GALLERY, GIF }
 
 enum MessageSender { BOT, USER }
 
-enum MessageType { TEXT, IMAGE }
+enum MessageType { TEXT, SKIP, IMAGE, GIF }
 
-class ChatAction {
-  ChatActionType type;
+class ChatAction extends Equatable {
+  final ChatActionType type;
 
   ChatAction(this.type);
 
@@ -22,57 +22,76 @@ class ChatAction {
         return "Skip";
       case ChatActionType.PHOTO:
         return "Photo";
-      case ChatActionType.GALERY:
+      case ChatActionType.GALLERY:
         return "Gallery";
-        break;
+      case ChatActionType.GIF:
+        return "GIF";
     }
   }
 
   get avatar {
     switch (type) {
       case ChatActionType.TEXT:
-        return null;
+        return Icons.text_fields;
       case ChatActionType.SKIP:
         return Icons.skip_next;
       case ChatActionType.PHOTO:
         return Icons.camera_alt;
-      case ChatActionType.GALERY:
+      case ChatActionType.GALLERY:
         return Icons.image;
-        break;
+      case ChatActionType.GIF:
+        return Icons.gif;
     }
   }
+
+  factory ChatAction.text() => ChatAction(ChatActionType.TEXT);
+
+  factory ChatAction.skip() => ChatAction(ChatActionType.SKIP);
+
+  factory ChatAction.photo() => ChatAction(ChatActionType.PHOTO);
+
+  factory ChatAction.gallery() => ChatAction(ChatActionType.GALLERY);
+
+  factory ChatAction.gif() => ChatAction(ChatActionType.GIF);
+
+  @override
+  List<Object> get props => [type];
 }
 
-class ChatMessage extends Equatable {
-  final ChatState chatState;
+class ChatHistoryMessage extends Equatable {
+  final ChatStage chatStage;
   final MessageSender messageSender;
   final String body;
   final MessageType type;
 
   @override
-  List<Object> get props => [chatState, messageSender, body, type];
+  List<Object> get props => [chatStage, messageSender, body, type];
 
-  ChatMessage({this.chatState, this.messageSender, this.body, this.type = MessageType.TEXT});
+  ChatHistoryMessage(this.chatStage, this.messageSender, {this.body, this.type = MessageType.TEXT});
 
-  ChatMessage.welcome()
-      : chatState = ChatState.WELCOME,
+  ChatHistoryMessage.welcome()
+      : chatStage = ChatStage.WELCOME,
         messageSender = MessageSender.BOT,
         body = null,
         type = MessageType.TEXT;
 
   get messageBody {
     if (messageSender == MessageSender.BOT) {
-      switch (chatState) {
-        case ChatState.WELCOME:
+      switch (chatStage) {
+        case ChatStage.WELCOME:
           return "Welcome back, ";
-        case ChatState.ENTRY_1:
+        case ChatStage.ENTRY_1:
           return "Entry 1";
-        case ChatState.ENTRY_2:
+        case ChatStage.ENTRY_2:
           return "Entry 2";
-        case ChatState.ENTRY_3:
+        case ChatStage.ENTRY_3:
           return "Entry 3";
-        case ChatState.PICTURE:
+        case ChatStage.PICTURE:
           return "Picture";
+        case ChatStage.GIF:
+          return "Gif";
+        case ChatStage.FINISHED:
+          return "Congrats!";
       }
     }
 
@@ -80,34 +99,43 @@ class ChatMessage extends Equatable {
   }
 
   get chatActions {
-    List<ChatAction> actions = new List();
-    switch (chatState) {
-      case ChatState.WELCOME:
-        actions.add(ChatAction(ChatActionType.TEXT));
-        actions.add(ChatAction(ChatActionType.SKIP));
-        actions.add(ChatAction(ChatActionType.PHOTO));
-        actions.add(ChatAction(ChatActionType.GALERY));
-        break;
-      case ChatState.ENTRY_1:
-        actions.add(ChatAction(ChatActionType.TEXT));
-        actions.add(ChatAction(ChatActionType.SKIP));
-        break;
-      case ChatState.ENTRY_2:
-        actions.add(ChatAction(ChatActionType.TEXT));
-        actions.add(ChatAction(ChatActionType.SKIP));
-        break;
-      case ChatState.ENTRY_3:
-        actions.add(ChatAction(ChatActionType.TEXT));
-        actions.add(ChatAction(ChatActionType.SKIP));
-        break;
-      case ChatState.PICTURE:
-        actions.add(ChatAction(ChatActionType.TEXT));
-        actions.add(ChatAction(ChatActionType.SKIP));
-        break;
+    switch (chatStage) {
+      case ChatStage.WELCOME:
+        return [
+          ChatAction.skip(),
+          ChatAction.gif(),
+        ];
+      case ChatStage.ENTRY_1:
+        return [
+          ChatAction.skip(),
+          ChatAction.gif(),
+        ];
+      case ChatStage.ENTRY_2:
+        return [
+          ChatAction.skip(),
+          ChatAction.gif(),
+        ];
+      case ChatStage.ENTRY_3:
+        return [
+          ChatAction.skip(),
+          ChatAction.gif(),
+        ];
+      case ChatStage.PICTURE:
+        return [
+          ChatAction.skip(),
+          ChatAction.photo(),
+          ChatAction.gallery(),
+          ChatAction.gif(),
+        ];
+      case ChatStage.GIF:
+        return [
+          ChatAction.gif(),
+        ];
+      case ChatStage.FINISHED:
+        return [];
     }
-    return actions;
   }
 
   @override
-  String toString() => 'ChatMessage { chatState: $chatState }';
+  String toString() => 'ChatMessage { chatState: $chatStage }';
 }

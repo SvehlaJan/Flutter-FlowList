@@ -7,6 +7,7 @@ class FlowRecord {
   static const String KEY_ENTRY_2 = "entry_2";
   static const String KEY_ENTRY_3 = "entry_3";
   static const String KEY_IMAGE_URL = "image_url";
+  static const String KEY_GIF_URL = "gif_url";
   static const String KEY_DAY_SCORE = "day_score";
   static const String KEY_FAVORITE_ENTRY = "favorite_entry";
   static const String KEY_DATE_CREATED = "date_created";
@@ -17,23 +18,24 @@ class FlowRecord {
   String secondEntry;
   String thirdEntry;
   String imageUrl;
+  String gifUrl;
   int favoriteEntry;
   int dayScore;
   DateTime dateModified;
 
-  FlowRecord(this.dateTime, this.firstEntry, this.secondEntry, this.thirdEntry, this.imageUrl, this.favoriteEntry, this.dayScore, this.dateModified);
+  FlowRecord(this.dateTime, this.firstEntry, this.secondEntry, this.thirdEntry, this.imageUrl, this.gifUrl, this.favoriteEntry, this.dayScore, this.dateModified);
 
   String get apiDateStr => apiDateString(dateTime);
 
   bool get isSaved => dateModified != null;
 
-  static FlowRecord withDateStr(String date, {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
-    return new FlowRecord(DateTime.parse(date), firstEntry, secondEntry, thirdEntry, imageUrl, favoriteEntry, dayScore, dateModified);
+  static FlowRecord withDateStr(String date, {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, String gifUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
+    return new FlowRecord(DateTime.parse(date), firstEntry, secondEntry, thirdEntry, imageUrl, gifUrl, favoriteEntry, dayScore, dateModified);
   }
 
   factory FlowRecord.withDateTime(DateTime dateTime,
-      {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
-    return FlowRecord(dateTime, firstEntry, secondEntry, thirdEntry, imageUrl, favoriteEntry, dayScore, dateModified);
+      {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, String gifUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
+    return FlowRecord(dateTime, firstEntry, secondEntry, thirdEntry, imageUrl, gifUrl, favoriteEntry, dayScore, dateModified);
   }
 
   Map<String, dynamic> toMap() => {
@@ -41,6 +43,7 @@ class FlowRecord {
         FlowRecord.KEY_ENTRY_2: secondEntry,
         FlowRecord.KEY_ENTRY_3: thirdEntry,
         FlowRecord.KEY_IMAGE_URL: imageUrl,
+        FlowRecord.KEY_GIF_URL: gifUrl,
         FlowRecord.KEY_FAVORITE_ENTRY: favoriteEntry,
         FlowRecord.KEY_DAY_SCORE: dayScore,
         FlowRecord.KEY_DATE_MODIFIED: DateTime.now().toIso8601String(),
@@ -58,6 +61,7 @@ class FlowRecord {
         snapshot.data[FlowRecord.KEY_ENTRY_2] ?? "",
         snapshot.data[FlowRecord.KEY_ENTRY_3] ?? "",
         snapshot.data[FlowRecord.KEY_IMAGE_URL],
+        snapshot.data[FlowRecord.KEY_GIF_URL],
         snapshot.data[FlowRecord.KEY_FAVORITE_ENTRY] ?? -1,
         snapshot.data[FlowRecord.KEY_DAY_SCORE],
         dateTimeModified,

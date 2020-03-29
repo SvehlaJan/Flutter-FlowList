@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
-import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:provider/provider.dart';
 
 class FlowRecordTile extends StatelessWidget {
 //  final Animation<double> _animation;

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/user_model.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
@@ -10,7 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
-class UserRepository with ChangeNotifier {
+class UserRepository {
   FirebaseAuth _firebaseAuth;
   FirebaseUser _firebaseUser;
   Status _status = Status.Uninitialized;
@@ -25,13 +24,17 @@ class UserRepository with ChangeNotifier {
 
   Stream<FlowUser> get userStream => _onUserChangeController.stream;
 
+  StreamController<Status> _onStatusChangeController = StreamController.broadcast();
+
+  Stream<Status> get statusStream => _onStatusChangeController.stream;
+
   UserRepository.instance() : _firebaseAuth = FirebaseAuth.instance {
     _firebaseAuth.onAuthStateChanged.listen(_onAuthStateChanged);
   }
 
   Status get status => _status;
 
-  FlowUser get currentUser => FlowUser.fromFirebase(_firebaseUser);
+  FlowUser get currentUser => _firebaseUser != null ? FlowUser.fromFirebase(_firebaseUser) : null;
 
   bool get isLoggedIn => _status == Status.Authenticated;
 
@@ -39,21 +42,21 @@ class UserRepository with ChangeNotifier {
 
   Future<bool> signInWithEmail(String email, String password) async {
     try {
-      _status = Status.Authenticating;
-      notifyListeners();
+      _setStatus(Status.Authenticating);
+
       await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       return true;
     } catch (e) {
-      _status = Status.Unauthenticated;
-      notifyListeners();
+      print(e);
+      _setStatus(Status.Unauthenticated);
       return false;
     }
   }
 
   Future<bool> signInWithGoogle() async {
     try {
-      _status = Status.Authenticating;
-      notifyListeners();
+      _setStatus(Status.Authenticating);
+
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.getCredential(
@@ -64,45 +67,49 @@ class UserRepository with ChangeNotifier {
       return true;
     } catch (e) {
       print(e);
-      _status = Status.Unauthenticated;
-      notifyListeners();
+      _setStatus(Status.Unauthenticated);
       return false;
     }
   }
 
   Future<bool> signInAnonymously() async {
     try {
-      _status = Status.Authenticating;
-      notifyListeners();
+      _setStatus(Status.Authenticating);
 
       await _firebaseAuth.signInAnonymously();
       return true;
     } on PlatformException catch (e) {
       print(e);
-
-      _status = Status.Unauthenticated;
-      notifyListeners();
+      _setStatus(Status.Unauthenticated);
       return false;
     }
   }
 
-  Future signOut() async {
+  Future<void> signOut() async {
     _firebaseAuth.signOut();
-    _status = Status.Unauthenticated;
-    notifyListeners();
+    _setStatus(Status.Unauthenticated);
     return Future.delayed(Duration.zero);
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
-    _onUserChangeController.add(FlowUser.fromFirebase(firebaseUser));
+    _firebaseUser = firebaseUser;
 
     if (firebaseUser == null) {
-      _status = Status.Unauthenticated;
+      _setStatus(Status.Unauthenticated);
     } else {
-      _firebaseUser = firebaseUser;
       getIt<FlowRepository>().setUserId(firebaseUser.uid);
-      _status = Status.Authenticated;
+      _setStatus(Status.Authenticated);
     }
-    notifyListeners();
+
+    _setUser(currentUser);
+  }
+
+  void _setUser(FlowUser user) {
+    _onUserChangeController.add(user);
+  }
+
+  void _setStatus(Status status) {
+    _status = status;
+    _onStatusChangeController.add(status);
   }
 }

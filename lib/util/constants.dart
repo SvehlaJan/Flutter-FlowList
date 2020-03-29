@@ -12,6 +12,8 @@ extension AppThemeExtension on AppTheme {
 }
 
 class Constants {
+  static const String GIPHY_API_KEY = "Nfewh7d1aZmroeV1E22KO8kofEbe4cvD";
+
   static const String FIRESTORE_USERS = "users";
   static const String FIRESTORE_FLOW_NOTES = "flow_notes";
 

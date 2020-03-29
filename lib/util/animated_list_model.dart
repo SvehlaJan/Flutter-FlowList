@@ -13,15 +13,30 @@ class AnimatedListModel<E> {
   final GlobalKey<AnimatedListState> listKey;
   final dynamic removedItemBuilder;
   final List<E> items;
+  final Duration _duration = Duration(milliseconds: 300);
 
   AnimatedListState get _animatedList => listKey.currentState;
+
+  void setItems(List<E> newItems) {
+    for (E action in items) {
+      if (!newItems.contains(action)) {
+        removeAt(indexOf(action));
+      }
+    }
+
+    for (E action in newItems) {
+      if (!items.contains(action)) {
+        insert(length, action);
+      }
+    }
+  }
 
   void insert(int index, E item) {
     if (_animatedList == null) {
       return;
     }
     items.insert(index, item);
-    _animatedList.insertItem(index);
+    _animatedList.insertItem(index, duration: _duration);
   }
 
   E removeAt(int index) {
@@ -30,10 +45,13 @@ class AnimatedListModel<E> {
     }
     final E removedItem = items.removeAt(index);
     if (removedItem != null) {
-      _animatedList.removeItem(index,
-          (BuildContext context, Animation<double> animation) {
-        return removedItemBuilder(removedItem, context, animation);
-      });
+      _animatedList.removeItem(
+        index,
+        (BuildContext context, Animation<double> animation) {
+          return removedItemBuilder(removedItem, context, animation);
+        },
+        duration: _duration,
+      );
     }
     return removedItem;
   }

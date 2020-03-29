@@ -1,20 +1,19 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
-import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_bloc.dart';
-import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_event.dart';
-import 'package:flutter_flow_list/pages/chat/bloc/flow_chat_state.dart';
-import 'package:flutter_flow_list/repositories/flow_repository.dart';
-import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/pages/chat/chat_view_model.dart';
+import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
+import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/ui/chat_action_animated_list.dart';
+import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:giphy_client/giphy_client.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:provider_architecture/viewmodel_provider.dart';
 
 class FlowChatPage extends StatefulWidget {
   FlowChatPage() : super();
@@ -24,27 +23,28 @@ class FlowChatPage extends StatefulWidget {
 }
 
 class _FlowChatPageState extends BasePageState<FlowChatPage> {
-  FlowChatBloc _flowChatBloc;
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  AnimatedListModel<ChatAction> _chatActionList;
   final TextEditingController _inputController = new TextEditingController();
   final FocusNode _focusNode = new FocusNode();
-  AnimatedChatActionList _chatActionList;
-  bool _isLoading = false;
+
+  @override
+  String getPageTitle() => "Chat";
 
   @override
   void initState() {
     super.initState();
-    _flowChatBloc = BlocProvider.of<FlowChatBloc>(context);
-    _flowChatBloc.add(AppStarted());
+    _chatActionList = AnimatedListModel<ChatAction>(
+      listKey: _listKey,
+      initialItems: [],
+      removedItemBuilder: (action, context, animation) => ChatActionChip(
+        animation: animation,
+        action: action,
+        onTap: (chatAction) => _onChatActionClicked(chatAction),
+      ),
+    );
     _focusNode.addListener(_onFocusChange);
   }
-
-  void showContent() => setState(() {
-        _isLoading = false;
-      });
-
-  void showLoading() => setState(() {
-        _isLoading = true;
-      });
 
   void _onFocusChange() {
     if (_focusNode.hasFocus) {
@@ -55,141 +55,119 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
     }
   }
 
-  @override
-  String getPageTitle() {
-    return 'Chat';
-  }
-
-  void _onSendMessage(String text, [MessageType type = MessageType.TEXT]) {
+  void _onSendMessage(String text, ChatViewModel model, [MessageType type = MessageType.TEXT]) {
     _inputController.clear();
-    _flowChatBloc.add(MessageText(body: text, type: type));
+    model.onMessageSent(UserMessage(body: text, type: type));
   }
 
-  Future<void> _getImage(ImageSource source) async {
-    showLoading();
-    File imageFile = await ImagePicker.pickImage(source: source, maxHeight: Constants.uploadImageMaxSize, maxWidth: Constants.uploadImageMaxSize);
+  void _onChatActionClicked(ChatAction action) async {
+    // TODO - try to pass the model from builder
+    ChatViewModel model = getIt<ChatViewModel>();
 
-    if (imageFile != null) {
-      await uploadFile(imageFile);
+    switch (action.type) {
+      case ChatActionType.TEXT:
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Test")));
+        break;
+      case ChatActionType.SKIP:
+        _onSendMessage(action.label, model);
+        break;
+      case ChatActionType.PHOTO:
+        model.getImage(ImageSource.camera);
+        break;
+      case ChatActionType.GALLERY:
+        model.getImage(ImageSource.gallery);
+        break;
+      case ChatActionType.GIF:
+        GiphyGif gif = await GiphyPicker.pickGif(context: context, apiKey: Constants.GIPHY_API_KEY);
+        model.onGifSelected(gif);
+        break;
     }
-    showContent();
-  }
-
-  Future<void> uploadFile(File imageFile) async {
-    Provider.of<FlowRepository>(context, listen: false).uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
-      _onSendMessage(downloadUrl, MessageType.IMAGE);
-    }, onError: (err) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text("This file is not an image")));
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Constants.centeredProgressIndicator;
-    } else {
-      return buildScaffold(
-          context,
-          BlocBuilder(
-            bloc: _flowChatBloc,
-            builder: (BuildContext context, FlowChatState state) {
-              if (state is FlowChatLoading) {
-                return Constants.centeredProgressIndicator;
-              }
-              if (state is FlowChatError) {
-                return Center(
-                  child: Text(state.message),
-                );
-              }
-              if (state is FlowChatContent) {
-                return _buildChatContent(context, state);
-              }
-              return Constants.centeredProgressIndicator;
-            },
-          ));
-    }
+    return ViewModelProvider<ChatViewModel>.withConsumer(
+        viewModel: getIt<ChatViewModel>(),
+        reuseExisting: true,
+        onModelReady: (model) {
+          model.chatActionsStream.listen((chatActions) {
+            _chatActionList.setItems(chatActions);
+          });
+
+          model.startChat();
+        },
+        builder: (context, model, child) {
+          if (model.busy) {
+            return buildScaffold(context, Constants.centeredProgressIndicator);
+          } else {
+            return buildScaffold(context, _buildChatContent(context, model));
+          }
+        });
   }
 
-  Widget _buildChatContent(BuildContext context, FlowChatContent state) {
+  Widget _buildChatContent(BuildContext context, ChatViewModel model) {
     return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
       Expanded(
         child: ListView.builder(
           padding: EdgeInsets.all(12.0),
           reverse: true,
           itemBuilder: (BuildContext context, int index) {
-            if (state is FlowChatTyping && index == 0) {
-              return ChatTypingWidget();
+            if (model.state is FlowChatTyping && index == 0) {
+              return ChatTypingWidget(model);
             } else {
-              return ChatMessageWidget(message: state.messages[index]);
+              return ChatMessageWidget(model, model.state.messageHistory[index]);
             }
           },
-          itemCount: state.messages.length,
+          itemCount: model.state.messageHistory.length,
         ),
       ),
-      _buildChatInput(context, state)
+      _buildChatInput(context, model)
     ]);
   }
 
-  void _onChatActionClicked(ChatAction action) {
-    switch (action.type) {
-      case ChatActionType.TEXT:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Test")));
-        break;
-      case ChatActionType.SKIP:
-        _onSendMessage(action.label);
-        break;
-      case ChatActionType.PHOTO:
-        _getImage(ImageSource.camera);
-        break;
-      case ChatActionType.GALERY:
-        _getImage(ImageSource.gallery);
-        break;
-    }
+  Widget _buildChatActionItem(ChatAction action, BuildContext context, Animation<double> animation) {
+    return ChatActionChip(animation: animation, action: action, onTap: (chatAction) => _onChatActionClicked(chatAction));
   }
 
-  Widget _buildChatInput(BuildContext context, FlowChatContent state) {
-    bool enabled = !(state is FlowChatTyping);
+  Widget _buildChatInput(BuildContext context, ChatViewModel model) {
+    bool enabled = !(model.state is FlowChatTyping);
+
     return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-      Container(
-        height: 40.0,
-        child: AnimatedChatActionList(onActionTap: _onChatActionClicked, actions: state.chatActions),
-//        child: ListView.builder(
-//            padding: EdgeInsets.symmetric(horizontal: 8.0),
-//            itemBuilder: (context, index) {
-//              ChatAction action = state.chatActions[index];
-//              return Padding(
-//                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-//                child: ActionChip(
-//                    label: action.label != null ? Text(action.label) : null,
-//                    avatar: action.avatar != null ? Icon(action.avatar) : null,
-//                    onPressed: () {
-//                      _onChatActionClicked(action);
-//                    }),
-//              );
-//            },
-//            scrollDirection: Axis.horizontal,
-//            itemCount: state.chatActions.length),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+        child: Container(
+          height: 40.0,
+          child: AnimatedList(
+            key: _listKey,
+            scrollDirection: Axis.horizontal,
+            initialItemCount: 0,
+            itemBuilder: (context, index, animation) {
+              return _buildChatActionItem(_chatActionList.items[index], context, animation);
+            },
+          ),
+        ),
       ),
       Row(children: <Widget>[
-        Flexible(
-          child: TextField(
-            textCapitalization: TextCapitalization.sentences,
-            style: Theme.of(context).textTheme.body1,
-            controller: _inputController,
-            autofocus: false,
-            textInputAction: TextInputAction.newline,
-            maxLines: null,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-              border: InputBorder.none,
-              hintText: 'Type your message...',
-              hintStyle: Theme.of(context).textTheme.body1,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+            child: TextField(
+              textCapitalization: TextCapitalization.sentences,
+              controller: _inputController,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (message) => model.onMessageSent(UserMessage(body: message)),
+              maxLines: null,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                border: OutlineInputBorder(),
+                hintText: 'Type your message...',
+              ),
+              focusNode: _focusNode,
             ),
-            focusNode: _focusNode,
           ),
         ),
         InkWell(
-          onTap: enabled ? () => _onSendMessage(_inputController.text) : null,
+          onTap: enabled ? () => _onSendMessage(_inputController.text, model) : null,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Icon(Icons.send, color: enabled ? Theme.of(context).accentColor : Theme.of(context).disabledColor),
@@ -201,9 +179,10 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
 }
 
 class ChatMessageWidget extends StatelessWidget {
-  final ChatMessage message;
+  final ChatViewModel model;
+  final ChatHistoryMessage message;
 
-  const ChatMessageWidget({Key key, @required this.message}) : super(key: key);
+  const ChatMessageWidget(this.model, this.message);
 
   @override
   Widget build(BuildContext context) {
@@ -224,26 +203,30 @@ class ChatMessageWidget extends StatelessWidget {
         ),
       );
     }
-    return ChatBubble(message: message, child: body);
+    return ChatBubble(model, message, body);
   }
 }
 
 class ChatTypingWidget extends StatelessWidget {
+  final ChatViewModel model;
+
+  ChatTypingWidget(this.model);
+
   @override
   Widget build(BuildContext context) {
-    return ChatBubble(message: null, child: SpinKitThreeBounce(color: Theme.of(context).textTheme.body1.color, size: 24.0));
+    return ChatBubble(model, null, SpinKitThreeBounce(color: Theme.of(context).textTheme.body1.color, size: 24.0));
   }
 }
 
 class ChatBubble extends Container {
-  final ChatMessage message;
+  final ChatViewModel model;
+  final ChatHistoryMessage message;
   final Widget child;
 
-  ChatBubble({this.message, this.child});
+  ChatBubble(this.model, this.message, this.child);
 
   @override
   Widget build(BuildContext context) {
-    UserRepository userRepository = Provider.of<UserRepository>(context);
     bool fromUser = message != null && message.messageSender == MessageSender.USER;
 
     final bg = fromUser ? Theme.of(context).cardColor : Theme.of(context).primaryColorLight;
@@ -260,14 +243,14 @@ class ChatBubble extends Container {
           );
 
     Widget avatar;
-    if (fromUser && userRepository.isLoggedIn) {
+    if (fromUser && model.isUserLoggedIn) {
       avatar = ClipOval(
         child: CachedNetworkImage(
           width: Constants.avatarImageSize,
           height: Constants.avatarImageSize,
           placeholder: (context, url) => CircularProgressIndicator(),
           errorWidget: (context, url, error) => Icon(Icons.error),
-          imageUrl: userRepository.getPhotoUrl() ?? "",
+          imageUrl: model.currentUser.photoUrl ?? "",
           fit: BoxFit.cover,
         ),
       );

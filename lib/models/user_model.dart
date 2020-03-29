@@ -1,23 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FlowUser {
-  String id;
-  String name;
+  final String id;
+  final String name;
+  final String photoUrl;
 
-  FlowUser(this.id, this.name);
+  FlowUser(this.id, this.name, this.photoUrl);
 
-  factory FlowUser.fromJson(Map<String, dynamic> json) => FlowUser(json['id'], json['name']);
+  factory FlowUser.fromJson(Map<String, dynamic> json) => FlowUser(json['id'], json['name'], json['photoUrl']);
 
-  Map<dynamic, dynamic> toJson() => {'id': id, 'name': name};
-
-  factory FlowUser.fromFirestore(DocumentSnapshot documentSnapshot) {
-    FlowUser user = FlowUser.fromJson(documentSnapshot.data);
-    user.id = documentSnapshot.documentID;
-    return user;
-  }
+  Map<dynamic, dynamic> toJson() => {'id': id, 'name': name, 'photoUrl': photoUrl};
 
   factory FlowUser.fromFirebase(FirebaseUser firebaseUser) {
-    return FlowUser(firebaseUser.uid, firebaseUser.displayName);
+    return FlowUser(firebaseUser.uid, firebaseUser.displayName, firebaseUser.photoUrl);
   }
 }

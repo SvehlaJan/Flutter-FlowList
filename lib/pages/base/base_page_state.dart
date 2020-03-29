@@ -18,7 +18,7 @@ abstract class BasePageState<T extends StatefulWidget> extends State<T> {
 
   Widget buildWillPopScope(BuildContext context, Widget body) => WillPopScope(onWillPop: onBackPressed, child: body);
 
-  Widget buildScaffold(BuildContext context, Widget body, {Color backgroundColor, FloatingActionButton fab}) {
+  Widget buildScaffold(BuildContext context, Widget body, {Color backgroundColor, FloatingActionButton fab, List<AppBarAction> appBarActions}) {
     bool showAppBar = getPageTitle() != null || getAppBarActions(context) != null;
     return WillPopScope(
       onWillPop: onBackPressed,
@@ -28,7 +28,7 @@ abstract class BasePageState<T extends StatefulWidget> extends State<T> {
             ? AppBar(
                 leading: ModalRoute.of(context).canPop ? IconButton(icon: BackButtonIcon(), onPressed: finishScreen) : null,
                 title: Text(getPageTitle()),
-                actions: _buildAppBarActions(context),
+                actions: _buildAppBarActions(context, appBarActions ?? getAppBarActions(context)),
               )
             : null,
         body: Builder(builder: (BuildContext context) => body),
@@ -37,17 +37,16 @@ abstract class BasePageState<T extends StatefulWidget> extends State<T> {
     );
   }
 
-  List<Widget> _buildAppBarActions(BuildContext context) {
-    List<AppBarAction> actions = getAppBarActions(context);
+  List<Widget> _buildAppBarActions(BuildContext context, List<AppBarAction> appBarActions) {
     List<Widget> widgets = List();
 
-    if (actions == null) {
+    if (appBarActions == null) {
       return widgets;
-    } else if (actions.length <= 2) {
-      widgets.addAll(actions.map((action) => _makeImageButton(action)));
+    } else if (appBarActions.length <= 2) {
+      widgets.addAll(appBarActions.map((action) => _makeImageButton(action)));
     } else {
-      widgets.add(_makeImageButton(actions[0]));
-      widgets.add(_makePopupMenu(actions.skip(1)));
+      widgets.add(_makeImageButton(appBarActions[0]));
+      widgets.add(_makePopupMenu(appBarActions.skip(1)));
     }
     return widgets;
   }

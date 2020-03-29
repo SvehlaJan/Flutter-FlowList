@@ -13,11 +13,11 @@ class AppStarted extends FlowChatEvent {
   List<Object> get props => [];
 }
 
-class MessageText extends FlowChatEvent {
+class UserMessage extends FlowChatEvent {
   final String body;
   final MessageType type;
 
-  MessageText({this.body, this.type});
+  UserMessage({this.body, this.type});
 
   @override
   String toString() => 'Message { body: $body }';

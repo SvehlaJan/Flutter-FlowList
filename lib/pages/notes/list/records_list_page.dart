@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
-import 'package:flutter_flow_list/pages/flow/record_detail_page.dart';
-import 'package:flutter_flow_list/pages/flow/records_list_view_model.dart';
+import 'package:flutter_flow_list/pages/notes/detail/record_detail_page.dart';
+import 'package:flutter_flow_list/pages/notes/list/records_list_view_model.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';
 import 'package:flutter_flow_list/ui/flow_record_tile.dart';
 import 'package:flutter_flow_list/util/constants.dart';
@@ -19,7 +19,7 @@ class _RecordsListPageState extends BasePageState<RecordsListPage> with TickerPr
   String getPageTitle() => "Flow notes";
 
   void _openRecordDetailPage(String date) {
-    Navigator.pushNamed(context, Constants.recordDetailRoute, arguments: {RecordDetailPage.ARG_DATE: date});
+    Navigator.of(context).pushNamed(Constants.recordDetailRoute, arguments: RecordDetailPage.createArguments(dateStr: date));
   }
 
   @override
@@ -39,7 +39,7 @@ class _RecordsListPageState extends BasePageState<RecordsListPage> with TickerPr
                   itemBuilder: (context, index) {
                     FlowRecord record = model.records[index];
                     return FlowRecordTile(record, (() {
-                      _openRecordDetailPage(record.apiDateStr);
+                      model.onRecordClicked(record);
                     }));
                   }),
               fab: FloatingActionButton(onPressed: () => _openRecordDetailPage(null), tooltip: 'Add', child: const Icon(Icons.add)));

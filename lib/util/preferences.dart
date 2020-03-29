@@ -20,12 +20,7 @@ class Preferences {
     // initialization code
   }
 
-  static Preferences getSync() {
-    if (!_initialized) throw Exception("Cache must be initialized at first!");
-    return _instance;
-  }
-
-  static Future<Preferences> initAndGet() async {
+  static Future<Preferences> init() async {
     if (_initialized) return _instance;
 
     _prefs = await SharedPreferences.getInstance();
