@@ -1,0 +1,57 @@
+{
+  "app_name": "Flow List",
+
+  "general_submit": "Submit",
+  "general_add": "Add",
+  "general_delete": "Delete",
+  "general_cancel": "Cancel",
+  "general_email": "Email",
+  "general_password": "Password",
+
+  "error_image_invalid": "This file is not an image",
+  "error_page_not_found": "Page not found :-(",
+
+  "chat_title": "Chat",
+  "chat_input_hint": "Type your message...",
+
+  "settings_title": "Settings",
+
+  "login_title": "Login",
+  "login_error_email_empty": "Email can't be empty.",
+  "login_error_email_invalid": "Email is not valid.",
+  "login_error_password_empty": "Password can't be empty.",
+  "login_button_login": "Login",
+  "login_button_google_login": "Google login",
+  "login_button_skip": "Skip",
+
+  "records_list_title": "Flow notes",
+  "records_list_empty_title": "Welcome happy human!",
+  "records_list_empty_body": "Start with your first entry or link an account so that we can know each other better.",
+  "records_list_button_chat": "Let's chat",
+  "records_list_button_login": "Log in",
+
+  "record_detail_title": "Your day",
+  "record_detail_by_prefix": "By",
+  "record_detail_entry_hint_1": "Your first entry",
+  "record_detail_entry_hint_2": "Your second entry",
+  "record_detail_entry_hint_3": "Your third entry",
+  "record_detail_delete_dialog_title": "Are you sure to delete this record?",
+  "record_detail_date_picker_title": "Select date",
+  "record_detail_score_picker_title": "Day score",
+
+  "chat_action_lets_do_it": "Let's do it!",
+  "chat_action_skip": "Skip",
+  "chat_action_photo": "Photo",
+  "chat_action_gallery": "Gallery",
+  "chat_action_gif": "Gif",
+
+  "chat_bot_welcome": "Welcome :-) Let's write down your best moments of the day.",
+  "chat_bot_entry_1": "What was your best moment of the day?",
+  "chat_bot_entry_2": "It sounds great! What was your second best moment?",
+  "chat_bot_entry_3": "Lucky you! And what was the third best moment?",
+  "chat_bot_picture": "Great. Would you like to add some picture or photo to this day?",
+  "chat_bot_gif": "You can also add some funny GIF :-)",
+  "chat_bot_finished": "Great work! You can now see your notes history.",
+
+  "aaa": "bbb"
+}

@@ -48,8 +48,6 @@ Widget generatePage(String name, {Object arguments}) {
       return RecordDetailPage(dateStr, photoUrl);
     case Constants.settingsRoute:
       return SettingsPage();
-    case Constants.settingsLoginRoute:
-      return LoginPage();
   }
 
   return null;

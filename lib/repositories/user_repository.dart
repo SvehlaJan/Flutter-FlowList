@@ -13,12 +13,7 @@ class UserRepository {
   FirebaseAuth _firebaseAuth;
   FirebaseUser _firebaseUser;
   Status _status = Status.Uninitialized;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>[
-      'email',
-//      'https://www.googleapis.com/auth/contacts.readonly',
-    ],
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: <String>['email']);
 
   StreamController<FlowUser> _onUserChangeController = StreamController.broadcast();
 
@@ -37,8 +32,6 @@ class UserRepository {
   FlowUser get currentUser => _firebaseUser != null ? FlowUser.fromFirebase(_firebaseUser) : null;
 
   bool get isLoggedIn => _status == Status.Authenticated;
-
-  String getPhotoUrl() => _firebaseUser.photoUrl;
 
   Future<bool> signInWithEmail(String email, String password) async {
     try {

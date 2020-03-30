@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/navigation/navigation_helper.dart';
 
 class FlowApp extends StatefulWidget {

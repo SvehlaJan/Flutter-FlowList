@@ -2,13 +2,12 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/util/theme/theme_dark.dart';
-import 'package:flutter_flow_list/util/theme/theme_light.dart';
+import 'package:flutter_flow_list/util/theme_notifier.dart';
 
 enum AppTheme { light, dark }
 
 extension AppThemeExtension on AppTheme {
-  ThemeData get themeData => this == AppTheme.dark ? themeDark : themeLight;
+  ThemeData getThemeData(BuildContext context) => this == AppTheme.dark ? ThemeHelper.getThemeDark(context) : ThemeHelper.getThemeLight(context);
 }
 
 class Constants {
@@ -34,13 +33,12 @@ class Constants {
   static const String recordDetailRoute = "kopr/add";
   static const String chatRoute = "chat";
   static const String settingsRoute = "settings";
-  static const String settingsLoginRoute = "settings/login";
   static const String notFoundRoute = "not_found";
 
-  static final Random _random = new Random();
+  static final Random _random = Random();
 
   /// Returns a random color.
   static Color next() {
-    return new Color(0xFF000000 + _random.nextInt(0x00FFFFFF));
+    return Color(0xFF000000 + _random.nextInt(0x00FFFFFF));
   }
 }

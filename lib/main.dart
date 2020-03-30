@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/app.dart';
 import 'package:flutter_flow_list/locator.dart';
-import 'package:flutter_flow_list/util/language_notifier.dart';
-import 'package:flutter_flow_list/util/theme_notifier.dart';
 import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/util/language_notifier.dart';
 import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
-import 'package:flutter_flow_list/util/app_localization_service.dart';
+import 'package:flutter_flow_list/util/theme_notifier.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+
+import 'generated/l10n.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,21 +40,18 @@ class MyApp extends StatelessWidget {
 //    bool isDark = brightnessValue == Brightness.dark;
 
     return MaterialApp(
-      title: 'FlowList',
+      title: "Flow List",
       navigatorKey: getIt<NavigationService>().navigationKey,
-      theme: themeNotifier.appTheme.themeData,
+      theme: themeNotifier.appTheme.getThemeData(context),
       home: FlowApp(),
       locale: appLanguageNotifier.appLocal,
       localizationsDelegates: [
-        AppLocalizationsService.delegate,
+        S.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en'),
-        const Locale('sk'),
-      ],
+      supportedLocales: S.delegate.supportedLocales,
     );
   }
 }

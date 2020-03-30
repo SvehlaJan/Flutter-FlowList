@@ -13,7 +13,9 @@ class SettingsViewModel extends BaseModel {
     });
   }
 
+  Status get currentStatus => userRepository.status;
+
   void signOut() => userRepository.signOut();
 
-  void onAccountClicked() => getIt<NavigationService>().navigateTo(Constants.settingsLoginRoute);
+  void onAccountClicked() => getIt<NavigationService>().navigateTo(Constants.loginRoute);
 }

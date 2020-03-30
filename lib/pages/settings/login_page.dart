@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flow_list/generated/l10n.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
 import 'package:flutter_flow_list/pages/settings/login_view_model.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
+import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:provider_architecture/viewmodel_provider.dart';
 
@@ -16,10 +18,9 @@ class _LoginPageState extends BasePageState<LoginPage> {
 
   String _email;
   String _password;
-  String _authHint = '';
 
   @override
-  String getPageTitle() => "Login";
+  String getPageTitle() => S.of(context).login_title;
 
   void _validateAndSubmit(LoginViewModel model) async {
     final form = _formKey.currentState;
@@ -27,10 +28,6 @@ class _LoginPageState extends BasePageState<LoginPage> {
     if (form.validate()) {
       form.save();
       model.signInWithEmail(_email, _password);
-    } else {
-      setState(() {
-        _authHint = '';
-      });
     }
   }
 
@@ -64,31 +61,61 @@ class _LoginPageState extends BasePageState<LoginPage> {
   }
 
   Widget _buildForm(BuildContext context, LoginViewModel model) {
-    return Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (val) => val.isEmpty ? 'Email can\'t be empty.' : null,
-                onSaved: (val) => _email = val,
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (val) => val.isEmpty ? 'Password can\'t be empty.' : null,
-                onSaved: (val) => _password = val,
-              ),
-              Container(height: 80.0, padding: const EdgeInsets.all(16.0), child: Text(_authHint, style: Theme.of(context).textTheme.subtitle1, textAlign: TextAlign.center)),
-              RaisedButton(child: Text("Login", style: Theme.of(context).textTheme.button), onPressed: () => _validateAndSubmit(model)),
-              RaisedButton(color: Colors.redAccent, child: Text('Google Login', style: Theme.of(context).textTheme.button), onPressed: () => model.signInWithGoogle()),
-              RaisedButton(child: Text('Skip', style: Theme.of(context).textTheme.button), onPressed: () => model.signInAnonymously()),
-            ],
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraint.maxHeight),
+            child: IntrinsicHeight(
+              child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: R.string(context).general_email,
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (val) => val.isEmpty ? R.string(context).login_error_email_empty : null,
+                          onSaved: (val) => _email = val,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: R.string(context).general_password,
+                            border: OutlineInputBorder(),
+                          ),
+                          obscureText: true,
+                          validator: (val) => val.isEmpty ? (R.string(context).login_error_password_empty) : null,
+                          onSaved: (val) => _password = val,
+                        ),
+                      ),
+                      Expanded(child: Container()),
+                      RaisedButton(
+                        child: Text(R.string(context).login_button_login.toUpperCase(), style: Theme.of(context).textTheme.button),
+                        onPressed: () => _validateAndSubmit(model),
+                      ),
+                      RaisedButton(
+                        color: Colors.redAccent,
+                        child: Text(R.string(context).login_button_google_login.toUpperCase(), style: Theme.of(context).textTheme.button),
+                        onPressed: () => model.signInWithGoogle(),
+                      ),
+                      FlatButton(
+                        child: Text(R.string(context).login_button_skip.toUpperCase(), style: Theme.of(context).textTheme.button),
+                        onPressed: () => model.signInAnonymously(),
+                      ),
+                    ],
+                  )),
+            ),
           ),
-        ));
+        );
+      },
+    );
   }
 }

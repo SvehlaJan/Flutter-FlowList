@@ -5,7 +5,6 @@ import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
-import 'package:flutter_flow_list/util/app_localization_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:giphy_client/giphy_client.dart';
 
@@ -19,6 +18,5 @@ void setupLocator() {
   getIt.registerLazySingleton(() => NavigationService());
   getIt.registerLazySingleton(() => GiphyClient(apiKey: Constants.GIPHY_API_KEY));
   getIt.registerLazySingleton(() => ChatViewModel());
-  getIt.registerLazySingleton(() => AppLocalizationsService());
 //  getIt.registerSingletonAsync<FeatureService>(() async => FeatureService.init());
 }

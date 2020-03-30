@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
 import 'package:flutter_flow_list/pages/notes/detail/record_detail_view_model.dart';
+import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/date_picker_adapter.dart';
-import 'package:flutter_flow_list/util/navigation/feature_service.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider_architecture/viewmodel_provider.dart';
@@ -42,7 +41,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
   final FocusNode _entry3FocusNode = FocusNode();
 
   @override
-  String getPageTitle() => 'Detail';
+  String getPageTitle() => R.string(context).record_detail_title;
 
   void _onFabClicked(RecordsDetailViewModel model) {
     model.record.firstEntry = _entry1ValueController.text;
@@ -55,29 +54,42 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
   void _onDateClicked(RecordsDetailViewModel model) {
     DateTime today = DateTime.now();
     Picker(
-      hideHeader: true,
+      hideHeader: false,
       adapter: DatePickerAdapter(value: model.record.dateTime, dayMax: today.day, monthMax: today.month, yearMax: today.year),
-      title: Text("Select Date"),
+      title: Text(R.string(context).record_detail_date_picker_title),
       onConfirm: (Picker picker, List value) {
         DateTime dateTime = (picker.adapter as DatePickerAdapter).value;
         model.fetchRecord(dateTime);
       },
-    ).showDialog(context);
+    ).showModal(context);
+  }
+
+  void _onRatingClicked(RecordsDetailViewModel model) {
+    List<int> values = List<int>.generate(5, (i) => i + 1);
+    Picker(
+      adapter: PickerDataAdapter<String>(pickerdata: values),
+      selecteds: [(model.record.dayScore ?? 1) - 1],
+      title: Text(R.string(context).record_detail_score_picker_title),
+      changeToFirst: true,
+      hideHeader: false,
+      onConfirm: (Picker picker, List value) {
+        model.onDayScoreSelected(int.parse(picker.getSelectedValues().first.toString()));
+      },
+    ).showModal(context); //_scaffoldKey.currentState);
   }
 
   void _onDeleteClicked(RecordsDetailViewModel model) {
     showDialog<Null>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text("Delete record"),
-        content: Text("Are you sure to delete this record?"),
+        title: Text(R.string(context).record_detail_delete_dialog_title),
         actions: <Widget>[
           FlatButton(
-            child: Text('Cancel'),
+            child: Text(R.string(context).general_cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           FlatButton(
-            child: Text('Delete'),
+            child: Text(R.string(context).general_delete),
             onPressed: () {
               model.deleteFlowRecord().then((value) => Navigator.of(context).pop());
               Navigator.of(dialogContext).pop();
@@ -89,25 +101,12 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
     );
   }
 
-  void _onRatingClicked(RecordsDetailViewModel model) {
-    List<int> values = List<int>.generate(5, (i) => i + 1);
-    Picker(
-      adapter: PickerDataAdapter<String>(pickerdata: values),
-      selecteds: [(model.record.dayScore ?? 1) - 1],
-      changeToFirst: true,
-      hideHeader: false,
-      onConfirm: (Picker picker, List value) {
-        model.onDayScoreSelected(int.parse(picker.getSelectedValues().first.toString()));
-      },
-    ).showDialog(context); //_scaffoldKey.currentState);
-  }
-
   void _onFavoriteClicked(int index, RecordsDetailViewModel model) {
     model.onFavoriteEntrySelected(index);
   }
 
   List<AppBarAction> buildAppBarActions(BuildContext context, RecordsDetailViewModel model) {
-    return model.isEditMode ? [AppBarAction("Delete", Icons.delete_forever, _onDeleteClicked)] : null;
+    return model.isEditMode ? [AppBarAction("Delete", Icons.delete_forever, () => _onDeleteClicked(model))] : null;
   }
 
   @override
@@ -155,7 +154,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
             ),
             fab: FloatingActionButton(
               onPressed: () => (!model.busy) ? _onFabClicked(model) : null,
-              tooltip: 'Submit',
+              tooltip: R.string(context).general_submit,
               child: const Icon(Icons.check),
             ),
             appBarActions: (!model.busy) ? buildAppBarActions(context, model) : null,
@@ -175,7 +174,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(model.record.getUserDateString(), style: Theme.of(context).textTheme.headline6),
-                  Text("By " + model.currentUser.name, style: Theme.of(context).textTheme.caption)
+                  Text("${R.string(context).record_detail_by_prefix} ${model.currentUser.name}", style: Theme.of(context).textTheme.caption)
                 ],
               ),
             ),
@@ -202,7 +201,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         context,
         _entry1ValueController,
         _entry1FocusNode,
-        "Your first entry",
+        R.string(context).record_detail_entry_hint_1,
         model.record?.favoriteEntry == 0,
         () => _onFavoriteClicked(0, model),
         () => FocusScope.of(context).requestFocus(_entry2FocusNode),
@@ -211,7 +210,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         context,
         _entry2ValueController,
         _entry2FocusNode,
-        "Your second entry",
+        R.string(context).record_detail_entry_hint_2,
         model.record?.favoriteEntry == 1,
         () => _onFavoriteClicked(1, model),
         () => FocusScope.of(context).requestFocus(_entry3FocusNode),
@@ -220,7 +219,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         context,
         _entry2ValueController,
         _entry3FocusNode,
-        "Your third entry",
+        R.string(context).record_detail_entry_hint_3,
         model.record?.favoriteEntry == 2,
         () => _onFavoriteClicked(2, model),
         () => _onFabClicked(model),

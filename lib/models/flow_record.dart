@@ -30,7 +30,7 @@ class FlowRecord {
   bool get isSaved => dateModified != null;
 
   static FlowRecord withDateStr(String date, {String firstEntry, String secondEntry, String thirdEntry, String imageUrl, String gifUrl, int favoriteEntry, int dayScore, DateTime dateModified}) {
-    return new FlowRecord(DateTime.parse(date), firstEntry, secondEntry, thirdEntry, imageUrl, gifUrl, favoriteEntry, dayScore, dateModified);
+    return FlowRecord(DateTime.parse(date), firstEntry, secondEntry, thirdEntry, imageUrl, gifUrl, favoriteEntry, dayScore, dateModified);
   }
 
   factory FlowRecord.withDateTime(DateTime dateTime,

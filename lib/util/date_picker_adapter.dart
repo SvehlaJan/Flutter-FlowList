@@ -111,7 +111,7 @@ class DatePickerAdapter extends PickerAdapter<DateTime> {
     if (value == null) value = DateTime.now();
     int _maxLevel = getMaxLevel();
     if (picker.selecteds == null || picker.selecteds.length == 0) {
-      if (picker.selecteds == null) picker.selecteds = new List<int>();
+      if (picker.selecteds == null) picker.selecteds = List<int>();
       for (int i = 0; i < _maxLevel; i++) picker.selecteds.add(0);
     }
   }
@@ -199,7 +199,7 @@ class DatePickerAdapter extends PickerAdapter<DateTime> {
       dataChanged = true;
     }
 
-    value = new DateTime(year, month, day);
+    value = DateTime(year, month, day);
     if (dataChanged) {
       notifyDataChanged();
     }

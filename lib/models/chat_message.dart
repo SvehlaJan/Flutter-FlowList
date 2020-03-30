@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/util/R.dart';
 
 enum ChatStage { WELCOME, ENTRY_1, ENTRY_2, ENTRY_3, PICTURE, GIF, FINISHED }
 
-enum ChatActionType { TEXT, SKIP, PHOTO, GALLERY, GIF }
+enum ChatActionType { GO, SKIP, PHOTO, GALLERY, GIF }
 
 enum MessageSender { BOT, USER }
 
@@ -16,23 +17,23 @@ class ChatAction extends Equatable {
 
   get label {
     switch (type) {
-      case ChatActionType.TEXT:
-        return "Text";
+      case ChatActionType.GO:
+        return R.sString.chat_action_lets_do_it;
       case ChatActionType.SKIP:
-        return "Skip";
+        return R.sString.chat_action_skip;
       case ChatActionType.PHOTO:
-        return "Photo";
+        return R.sString.chat_action_photo;
       case ChatActionType.GALLERY:
-        return "Gallery";
+        return R.sString.chat_action_gallery;
       case ChatActionType.GIF:
-        return "GIF";
+        return R.sString.chat_action_gif;
     }
   }
 
   get avatar {
     switch (type) {
-      case ChatActionType.TEXT:
-        return Icons.text_fields;
+      case ChatActionType.GO:
+        return Icons.check;
       case ChatActionType.SKIP:
         return Icons.skip_next;
       case ChatActionType.PHOTO:
@@ -44,7 +45,7 @@ class ChatAction extends Equatable {
     }
   }
 
-  factory ChatAction.text() => ChatAction(ChatActionType.TEXT);
+  factory ChatAction.go() => ChatAction(ChatActionType.GO);
 
   factory ChatAction.skip() => ChatAction(ChatActionType.SKIP);
 
@@ -79,19 +80,19 @@ class ChatHistoryMessage extends Equatable {
     if (messageSender == MessageSender.BOT) {
       switch (chatStage) {
         case ChatStage.WELCOME:
-          return "Welcome back, ";
+          return R.sString.chat_bot_welcome;
         case ChatStage.ENTRY_1:
-          return "Entry 1";
+          return R.sString.chat_bot_entry_1;
         case ChatStage.ENTRY_2:
-          return "Entry 2";
+          return R.sString.chat_bot_entry_2;
         case ChatStage.ENTRY_3:
-          return "Entry 3";
+          return R.sString.chat_bot_entry_3;
         case ChatStage.PICTURE:
-          return "Picture";
+          return R.sString.chat_bot_picture;
         case ChatStage.GIF:
-          return "Gif";
+          return R.sString.chat_bot_gif;
         case ChatStage.FINISHED:
-          return "Congrats!";
+          return R.sString.chat_bot_finished;
       }
     }
 
@@ -102,30 +103,25 @@ class ChatHistoryMessage extends Equatable {
     switch (chatStage) {
       case ChatStage.WELCOME:
         return [
-          ChatAction.skip(),
-          ChatAction.gif(),
+          ChatAction.go(),
         ];
       case ChatStage.ENTRY_1:
         return [
           ChatAction.skip(),
-          ChatAction.gif(),
         ];
       case ChatStage.ENTRY_2:
         return [
           ChatAction.skip(),
-          ChatAction.gif(),
         ];
       case ChatStage.ENTRY_3:
         return [
           ChatAction.skip(),
-          ChatAction.gif(),
         ];
       case ChatStage.PICTURE:
         return [
           ChatAction.skip(),
           ChatAction.photo(),
           ChatAction.gallery(),
-          ChatAction.gif(),
         ];
       case ChatStage.GIF:
         return [

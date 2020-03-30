@@ -7,6 +7,7 @@ import 'package:flutter_flow_list/pages/chat/chat_view_model.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/ui/chat_action_animated_list.dart';
+import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -25,11 +26,10 @@ class FlowChatPage extends StatefulWidget {
 class _FlowChatPageState extends BasePageState<FlowChatPage> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   AnimatedListModel<ChatAction> _chatActionList;
-  final TextEditingController _inputController = new TextEditingController();
-  final FocusNode _focusNode = new FocusNode();
+  final TextEditingController _inputController = TextEditingController();
 
   @override
-  String getPageTitle() => "Chat";
+  String getPageTitle() => R.string(context).chat_title;
 
   @override
   void initState() {
@@ -43,16 +43,6 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
         onTap: (chatAction) => _onChatActionClicked(chatAction),
       ),
     );
-    _focusNode.addListener(_onFocusChange);
-  }
-
-  void _onFocusChange() {
-    if (_focusNode.hasFocus) {
-      // Hide sticker when keyboard appear
-//      setState(() {
-//        isShowSticker = false;
-//      });
-    }
   }
 
   void _onSendMessage(String text, ChatViewModel model, [MessageType type = MessageType.TEXT]) {
@@ -65,8 +55,8 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
     ChatViewModel model = getIt<ChatViewModel>();
 
     switch (action.type) {
-      case ChatActionType.TEXT:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Test")));
+      case ChatActionType.GO:
+        _onSendMessage(action.label, model);
         break;
       case ChatActionType.SKIP:
         _onSendMessage(action.label, model);
@@ -160,9 +150,8 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
                 border: OutlineInputBorder(),
-                hintText: 'Type your message...',
+                hintText: R.string(context).chat_input_hint,
               ),
-              focusNode: _focusNode,
             ),
           ),
         ),

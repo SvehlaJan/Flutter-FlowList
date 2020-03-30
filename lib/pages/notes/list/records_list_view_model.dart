@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/notes/detail/record_detail_page.dart';
@@ -19,14 +20,6 @@ class RecordsListViewModel extends BaseModel {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    // TODO
-    _flowRepository.streamFlowRecords().listen(null);
-  }
-
   void listenToRecords() {
     if (!isUserLoggedIn) {
       notifyListeners();
@@ -37,7 +30,7 @@ class RecordsListViewModel extends BaseModel {
 
     _flowRepository.streamFlowRecords().listen((recordsData) {
       List<FlowRecord> updatedRecords = recordsData;
-      if (updatedRecords != null && updatedRecords.length > 0) {
+      if (updatedRecords != null && updatedRecords.length > 0 && !listEquals(updatedRecords, _records)) {
         _records = updatedRecords;
         notifyListeners();
       }
@@ -48,5 +41,11 @@ class RecordsListViewModel extends BaseModel {
 
   void onRecordClicked(FlowRecord record) {
     getIt<NavigationService>().navigateTo(Constants.recordDetailRoute, arguments: RecordDetailPage.createArguments(dateStr: record.getApiDateString(), imageUrl: record.imageUrl));
+  }
+
+  void onChatClicked() {}
+
+  void onLoginClicked() {
+    getIt<NavigationService>().navigateTo(Constants.loginRoute);
   }
 }

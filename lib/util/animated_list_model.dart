@@ -18,7 +18,7 @@ class AnimatedListModel<E> {
   AnimatedListState get _animatedList => listKey.currentState;
 
   void setItems(List<E> newItems) {
-    for (E action in items) {
+    for (E action in List.from(items)) {
       if (!newItems.contains(action)) {
         removeAt(indexOf(action));
       }

@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/util/R.dart';
 
 class NotFoundPage extends StatelessWidget {
-  NotFoundPage();
-
   @override
   Widget build(BuildContext context) {
-    return new Material(
+    return Material(
       color: Colors.red,
-      child: new Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          new Text(
-            "Page not found :-(",
-            style: new TextStyle(color: Colors.white, fontSize: 30.0),
-          ),
-          new IconButton(
-              icon: new Icon(Icons.arrow_back),
-              color: Colors.white,
-              iconSize: 70.0,
-              onPressed: () {
-                Navigator.of(context).pop(false);
-//                Navigator.of(context).pushAndRemoveUntil(
-//                    new MaterialPageRoute(
-//                        builder: (BuildContext context) => new LandingPage()),
-//                    (Route route) => route == null);
-              })
+          Text(R.string(context).error_page_not_found, style: Theme.of(context).textTheme.headline2),
+          IconButton(icon: Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).pop(false))
         ],
       ),
     );

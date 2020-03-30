@@ -8,6 +8,7 @@ import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
+import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/viewmodels/base_model.dart';
 import 'package:giphy_client/src/models/gif.dart';
@@ -63,7 +64,7 @@ class ChatViewModel extends BaseModel {
   }
 
   void _sendMessagesWithDelay() async {
-    await new Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     _chatState = FlowChatMessages(_chatState.messageHistory);
     notifyListeners();
     _chatActionsController.add(_chatState.chatActions);
@@ -134,7 +135,7 @@ class ChatViewModel extends BaseModel {
       _record.imageUrl = downloadUrl;
       setBusy(false);
     }, onError: (err) {
-      showSnackBarController.add("This file is not an image");
+      showSnackBarController.add(R.sString.error_image_invalid);
       setBusy(false);
     });
   }

@@ -11,6 +11,8 @@ class LoginViewModel extends BaseModel {
     });
   }
 
+  Status get currentStatus => userRepository.status;
+
   Future<bool> signInWithEmail(String email, String password) async => userRepository.signInWithEmail(email, password);
 
   Future<bool> signInWithGoogle() async => userRepository.signInWithGoogle();

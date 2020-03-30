@@ -10,7 +10,6 @@ abstract class BaseModel extends ChangeNotifier {
   @override
   void dispose() {
     super.dispose();
-
     showSnackBarController.close();
   }
 
@@ -25,8 +24,6 @@ abstract class BaseModel extends ChangeNotifier {
   FlowUser get currentUser => userRepository.currentUser;
 
   bool get isUserLoggedIn => userRepository.isLoggedIn;
-
-  Status get currentStatus => userRepository.status;
 
   bool _busy = false;
 
