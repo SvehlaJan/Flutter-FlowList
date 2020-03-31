@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/pages/chat/flow_chat_page.dart';
+import 'package:flutter_flow_list/pages/chat/chat_page.dart';
 import 'package:flutter_flow_list/pages/notes/detail/record_detail_page.dart';
 import 'package:flutter_flow_list/pages/notes/list/records_list_page.dart';
 import 'package:flutter_flow_list/pages/settings/login_page.dart';

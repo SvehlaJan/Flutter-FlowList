@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
@@ -10,8 +9,11 @@ import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/util/event_helper.dart';
+import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
 import 'package:flutter_flow_list/viewmodels/base_model.dart';
-import 'package:giphy_client/src/models/gif.dart';
+import 'package:giphy_client/giphy_client.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatViewModel extends BaseModel {
@@ -22,15 +24,20 @@ class ChatViewModel extends BaseModel {
 
   FlowChatContent get state => _chatState;
 
-  @protected
   StreamController<List<ChatAction>> _chatActionsController = StreamController.broadcast();
 
   Stream<List<ChatAction>> get chatActionsStream => _chatActionsController.stream;
 
+  StreamController<Event> _showGiphyPickerController = StreamController.broadcast();
+
+  Stream<Event> get showGiphyPickerStream => _showGiphyPickerController.stream;
+
   @override
   void dispose() {
     super.dispose();
+
     _chatActionsController.close();
+    _showGiphyPickerController.close();
   }
 
   void startChat() async {
@@ -59,8 +66,29 @@ class ChatViewModel extends BaseModel {
     _sendMessagesWithDelay();
   }
 
+  void onChatActionClicked(ChatAction action) async {
+    switch (action.type) {
+      case ChatActionType.GO:
+        onMessageSent(UserMessage(action.label, MessageType.TEXT));
+        break;
+      case ChatActionType.SKIP:
+        onMessageSent(UserMessage(action.label, MessageType.SKIP));
+        break;
+      case ChatActionType.PHOTO:
+        getImage(ImageSource.camera);
+        break;
+      case ChatActionType.GALLERY:
+        getImage(ImageSource.gallery);
+        break;
+      case ChatActionType.GIF:
+        _showGiphyPickerController.sendEvent();
+        break;
+    }
+  }
+
   void onGifSelected(GiphyGif gif) {
     _record.gifUrl = gif.embedUrl;
+    onMessageSent(UserMessage(gif.embedUrl, MessageType.GIF));
   }
 
   void _sendMessagesWithDelay() async {
@@ -133,6 +161,7 @@ class ChatViewModel extends BaseModel {
   Future<void> uploadFile(File imageFile) async {
     _flowRepository.uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
       _record.imageUrl = downloadUrl;
+      onMessageSent(UserMessage(downloadUrl, MessageType.IMAGE));
       setBusy(false);
     }, onError: (err) {
       showSnackBarController.add(R.sString.error_image_invalid);

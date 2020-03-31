@@ -18,10 +18,17 @@ class AnimatedListModel<E> {
   AnimatedListState get _animatedList => listKey.currentState;
 
   void setItems(List<E> newItems) {
-    for (E action in List.from(items)) {
-      if (!newItems.contains(action)) {
-        removeAt(indexOf(action));
+    try {
+      for (E action in List.from(items)) {
+        if (!newItems.contains(action)) {
+          removeAt(indexOf(action));
+        }
       }
+    } catch (e) {
+      // This happens after gallery is used to pick an image
+      // The items in amimated list are reset and there is no way to check it
+      print("Removing item from animated list failed: $e");
+      items.clear();
     }
 
     for (E action in newItems) {
@@ -45,13 +52,7 @@ class AnimatedListModel<E> {
     }
     final E removedItem = items.removeAt(index);
     if (removedItem != null) {
-      _animatedList.removeItem(
-        index,
-        (BuildContext context, Animation<double> animation) {
-          return removedItemBuilder(removedItem, context, animation);
-        },
-        duration: _duration,
-      );
+      _animatedList.removeItem(index, (BuildContext context, Animation<double> animation) => removedItemBuilder(removedItem, context, animation), duration: _duration);
     }
     return removedItem;
   }

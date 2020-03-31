@@ -15,6 +15,9 @@ class ChatAction extends Equatable {
 
   ChatAction(this.type);
 
+  @override
+  List<Object> get props => [type];
+
   get label {
     switch (type) {
       case ChatActionType.GO:
@@ -54,9 +57,6 @@ class ChatAction extends Equatable {
   factory ChatAction.gallery() => ChatAction(ChatActionType.GALLERY);
 
   factory ChatAction.gif() => ChatAction(ChatActionType.GIF);
-
-  @override
-  List<Object> get props => [type];
 }
 
 class ChatHistoryMessage extends Equatable {
@@ -70,13 +70,11 @@ class ChatHistoryMessage extends Equatable {
 
   ChatHistoryMessage(this.chatStage, this.messageSender, {this.body, this.type = MessageType.TEXT});
 
-  ChatHistoryMessage.welcome()
-      : chatStage = ChatStage.WELCOME,
-        messageSender = MessageSender.BOT,
-        body = null,
-        type = MessageType.TEXT;
+  factory ChatHistoryMessage.welcome() => ChatHistoryMessage(ChatStage.WELCOME, MessageSender.BOT, body: null, type: MessageType.TEXT);
 
-  get messageBody {
+  bool get fromUser => messageSender == MessageSender.USER;
+
+  String get messageBody {
     if (messageSender == MessageSender.BOT) {
       switch (chatStage) {
         case ChatStage.WELCOME:
@@ -99,7 +97,7 @@ class ChatHistoryMessage extends Equatable {
     return body ?? "Null :-(";
   }
 
-  get chatActions {
+  List<ChatAction> get chatActions {
     switch (chatStage) {
       case ChatStage.WELCOME:
         return [
@@ -125,13 +123,16 @@ class ChatHistoryMessage extends Equatable {
         ];
       case ChatStage.GIF:
         return [
+          ChatAction.skip(),
           ChatAction.gif(),
         ];
       case ChatStage.FINISHED:
         return [];
     }
+
+    return [];
   }
 
   @override
-  String toString() => 'ChatMessage { chatState: $chatStage }';
+  String toString() => 'ChatHistoryMessage{chatStage: $chatStage, messageSender: $messageSender, body: $body, type: $type}';
 }

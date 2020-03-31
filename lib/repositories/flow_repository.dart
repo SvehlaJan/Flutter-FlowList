@@ -26,8 +26,7 @@ class FlowRepository {
   }
 
   Future<void> deleteFlowRecord(DateTime dateTime) async {
-    String dateStr = formatDate(dateTime, [yyyy, '-', mm, '-', dd]);
-    return _api.removeDocument(dateStr);
+    return _api.removeDocument(FlowRecord.apiDateString(dateTime));
   }
 
   Future<void> updateFlowRecord(FlowRecord flowRecord) async {
