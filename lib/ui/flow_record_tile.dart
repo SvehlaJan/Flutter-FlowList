@@ -1,58 +1,59 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/entities/flow_record_entity.dart';
+import 'package:flutter_flow_list/models/flow_record.dart';
+import 'package:flutter_flow_list/util/constants.dart';
 
 class FlowRecordTile extends StatelessWidget {
-  final Animation<double> _animation;
+//  final Animation<double> _animation;
   final FlowRecord _record;
   final VoidCallback _onTap;
 
-  FlowRecordTile(this._animation, this._record, this._onTap);
+  FlowRecordTile(
+      //      this._animation,
+      this._record,
+      this._onTap);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(2.0),
-      child: SizeTransition(
-        axis: Axis.vertical,
-        sizeFactor: _animation,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _onTap,
-          child: Card(
-              color: Colors.white,
-              child: Center(
-                child: new Container(
-                    padding: new EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              _record.date,
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 30.0),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          _record.firstEntry,
-                          style: TextStyle(color: Colors.black, fontSize: 16.0),
-                        ),
-                        Text(
-                          _record.secondEntry,
-                          style: TextStyle(color: Colors.black, fontSize: 16.0),
-                        ),
-                        Text(
-                          _record.thirdEntry,
-                          style: TextStyle(color: Colors.black, fontSize: 16.0),
-                        ),
-                      ],
-                    )),
-              )),
+    return Card(
+        child: InkWell(
+      onTap: _onTap,
+      child: Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(_record.getUserDateString(), style: Theme.of(context).textTheme.subtitle),
+                  Container(height: 4.0),
+                  Text("1. " + (_record.firstEntry ?? ""), style: Theme.of(context).textTheme.caption),
+                  Text("2. " + (_record.secondEntry ?? ""), style: Theme.of(context).textTheme.caption),
+                  Text("3. " + (_record.thirdEntry ?? ""), style: Theme.of(context).textTheme.caption),
+                ],
+              ),
+            ),
+            if (_record.imageUrl != null)
+              Hero(
+                tag: _record.imageUrl,
+                child: SizedBox(
+                  width: Constants.avatarImageSize,
+                  height: Constants.avatarImageSize,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) => Constants.centeredProgressIndicator,
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      imageUrl: _record.imageUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
-    );
+    ));
   }
 }
