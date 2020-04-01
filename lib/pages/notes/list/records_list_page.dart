@@ -7,7 +7,6 @@ import 'package:flutter_flow_list/pages/notes/list/records_list_view_model.dart'
 import 'package:flutter_flow_list/ui/flow_record_tile.dart';
 import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider_architecture/provider_architecture.dart';
 
 class RecordsListPage extends StatefulWidget {
@@ -48,13 +47,14 @@ class _RecordsListPageState extends BasePageState<RecordsListPage> with TickerPr
   }
 
   Widget _buildEmptyPlaceholder(BuildContext context, RecordsListViewModel model) {
+    // Scaffold without AppBar doesn't paint the StatusBar on it's own...
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Theme.of(context).accentColor));
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Expanded(child: SvgPicture.asset("assets/images/welcome.svg", semanticsLabel: 'Acme Logo')),
+        Expanded(child: Image.asset("assets/images/welcome.png")),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

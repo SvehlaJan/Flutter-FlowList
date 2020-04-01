@@ -43,7 +43,9 @@ class RecordsListViewModel extends BaseModel {
     getIt<NavigationService>().navigateTo(Constants.recordDetailRoute, arguments: RecordDetailPage.createArguments(dateStr: record.getApiDateString(), imageUrl: record.imageUrl));
   }
 
-  void onChatClicked() {}
+  void onChatClicked() {
+    showSnackBarController.add("Not yet implemented");
+  }
 
   void onLoginClicked() {
     getIt<NavigationService>().navigateTo(Constants.loginRoute);

@@ -7,6 +7,7 @@ import 'package:flutter_flow_list/pages/chat/chat_view_model.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/util/R.dart';
+import 'package:flutter_flow_list/util/Secrets.dart';
 import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -21,7 +22,6 @@ class FlowChatPage extends StatefulWidget {
 class _FlowChatPageState extends BasePageState<FlowChatPage> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   AnimatedListModel<ChatAction> _chatActionList;
-  final TextEditingController _inputController = TextEditingController();
 
   @override
   String getPageTitle() => R.string(context).chat_title;
@@ -38,7 +38,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   }
 
   void _onSendMessage(String text, ChatViewModel model, [MessageType type = MessageType.TEXT]) {
-    _inputController.clear();
+    model.inputController.clear();
     model.onMessageSent(UserMessage(text, type));
   }
 
@@ -53,7 +53,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
           });
 
           model.showGiphyPickerStream.listen((event) {
-            GiphyPicker.pickGif(context: context, apiKey: Constants.GIPHY_API_KEY).then((value) => model.onGifSelected(value));
+            GiphyPicker.pickGif(context: context, apiKey: getIt<Secrets>().giphyApiKey).then((value) => model.onGifSelected(value));
           });
 
           model.startChat();
@@ -88,13 +88,18 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
   }
 
   Widget _buildChatActionItem(ChatAction action, BuildContext context, Animation<double> animation) {
+    ChatViewModel model = getIt<ChatViewModel>();
+    bool enabled = !(model.state is FlowChatTyping);
     return ChatActionChip(
-        animation: animation,
-        action: action,
-        onTap: (chatAction) {
-          _inputController.clear();
-          getIt<ChatViewModel>().onChatActionClicked(chatAction);
-        });
+      animation: animation,
+      action: action,
+      onTap: enabled
+          ? (chatAction) {
+              model.inputController.clear();
+              model.onChatActionClicked(chatAction);
+            }
+          : null,
+    );
   }
 
   Widget _buildChatInput(BuildContext context, ChatViewModel model) {
@@ -121,7 +126,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
             padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
             child: TextField(
               textCapitalization: TextCapitalization.sentences,
-              controller: _inputController,
+              controller: model.inputController,
               textInputAction: TextInputAction.send,
               onSubmitted: (message) => model.onMessageSent(UserMessage(message, MessageType.TEXT)),
               maxLines: null,
@@ -134,7 +139,7 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
           ),
         ),
         InkWell(
-          onTap: enabled ? () => _onSendMessage(_inputController.text, model) : null,
+          onTap: enabled ? () => _onSendMessage(model.inputController.text, model) : null,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Icon(Icons.send, color: enabled ? Theme.of(context).accentColor : Theme.of(context).disabledColor),

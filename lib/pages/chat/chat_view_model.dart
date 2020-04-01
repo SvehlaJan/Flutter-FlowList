@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/models/chat_message.dart';
 import 'package:flutter_flow_list/models/flow_record.dart';
@@ -10,10 +11,8 @@ import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/event_helper.dart';
-import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
 import 'package:flutter_flow_list/viewmodels/base_model.dart';
 import 'package:giphy_client/giphy_client.dart';
-import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatViewModel extends BaseModel {
@@ -31,6 +30,8 @@ class ChatViewModel extends BaseModel {
   StreamController<Event> _showGiphyPickerController = StreamController.broadcast();
 
   Stream<Event> get showGiphyPickerStream => _showGiphyPickerController.stream;
+
+  final TextEditingController inputController = TextEditingController();
 
   @override
   void dispose() {
@@ -87,8 +88,8 @@ class ChatViewModel extends BaseModel {
   }
 
   void onGifSelected(GiphyGif gif) {
-    _record.gifUrl = gif.embedUrl;
-    onMessageSent(UserMessage(gif.embedUrl, MessageType.GIF));
+    _record.gifUrl = gif.images.original.url;
+    onMessageSent(UserMessage(gif.images.original.url, MessageType.GIF));
   }
 
   void _sendMessagesWithDelay() async {
