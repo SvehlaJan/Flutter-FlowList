@@ -7,7 +7,7 @@ import 'package:flutter_flow_list/pages/chat/chat_view_model.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/util/R.dart';
-import 'package:flutter_flow_list/util/Secrets.dart';
+import 'package:flutter_flow_list/util/secrets.dart';
 import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';

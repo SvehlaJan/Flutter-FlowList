@@ -4,7 +4,7 @@ import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/pages/notes/detail/record_detail_page.dart';
 import 'package:flutter_flow_list/repositories/flow_repository.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
+import 'package:flutter_flow_list/util/navigation_service.dart';
 import 'package:flutter_flow_list/viewmodels/base_model.dart';
 
 class RecordsListViewModel extends BaseModel {

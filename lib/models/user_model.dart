@@ -12,6 +12,7 @@ class FlowUser {
   Map<dynamic, dynamic> toJson() => {'id': id, 'name': name, 'photoUrl': photoUrl};
 
   factory FlowUser.fromFirebase(FirebaseUser firebaseUser) {
-    return FlowUser(firebaseUser.uid, firebaseUser.displayName, firebaseUser.photoUrl);
+    var user = FlowUser(firebaseUser.uid, firebaseUser.displayName, firebaseUser.photoUrl);
+    return user;
   }
 }

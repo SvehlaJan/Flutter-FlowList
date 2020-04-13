@@ -34,9 +34,7 @@ class _RecordsListPageState extends BasePageState<RecordsListPage> with TickerPr
                   itemCount: model.records.length,
                   itemBuilder: (context, index) {
                     FlowRecord record = model.records[index];
-                    return FlowRecordTile(record, (() {
-                      model.onRecordClicked(record);
-                    }));
+                    return FlowRecordTile(record: record, onTap: (() => model.onRecordClicked(record)));
                   }),
               fab: FloatingActionButton(onPressed: () => model.onRecordClicked(null), tooltip: R.string(context).general_add, child: const Icon(Icons.add)));
         } else {

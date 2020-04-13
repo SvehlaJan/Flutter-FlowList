@@ -60,15 +60,15 @@ class RecordsDetailViewModel extends BaseModel {
     notifyListeners();
   }
 
-  Future<void> updateFlowRecord() async {
+  Future<void> onUpdateClicked() async {
     return _flowRepository.updateFlowRecord(_record);
   }
 
-  Future<void> deleteFlowRecord() async {
+  Future<void> onDeleteClicked() async {
     return _flowRepository.deleteFlowRecord(_record.dateTime);
   }
 
-  Future<void> getImage(ImageSource source) async {
+  Future<void> onImagePickerClicked(ImageSource source) async {
     setBusy(true);
 
     File imageFile = await ImagePicker.pickImage(source: source, maxHeight: Constants.uploadImageMaxSize, maxWidth: Constants.uploadImageMaxSize);
@@ -81,7 +81,7 @@ class RecordsDetailViewModel extends BaseModel {
   }
 
   Future<void> uploadFile(File imageFile) async {
-    _flowRepository.uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
+    _flowRepository.uploadImage(imageFile, DateTime.now(), currentUser.id).then((downloadUrl) {
       _record.imageUrl = downloadUrl;
       setBusy(false);
     }, onError: (err) {

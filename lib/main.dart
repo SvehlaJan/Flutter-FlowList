@@ -3,7 +3,7 @@ import 'package:flutter_flow_list/app.dart';
 import 'package:flutter_flow_list/locator.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/language_notifier.dart';
-import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
+import 'package:flutter_flow_list/util/navigation_service.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
 import 'package:flutter_flow_list/util/theme_notifier.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,17 +16,19 @@ void main() async {
   setupLocator();
 
   getIt.allReady().then((value) {
-    int appThemeIndex = Preferences.getInt(Preferences.KEY_SETTINGS_THEME) ?? 0;
-    AppTheme appTheme = AppTheme.values[appThemeIndex];
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier(appTheme)),
-          ChangeNotifierProvider<AppLanguageNotifier>(create: (_) => AppLanguageNotifier()),
-        ],
-        child: MyApp(),
-      ),
-    );
+    getIt.getAsync<Preferences>().then((value) {
+      int appThemeIndex = Preferences.getInt(Preferences.KEY_SETTINGS_THEME) ?? 0;
+      AppTheme appTheme = AppTheme.values[appThemeIndex];
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier(appTheme)),
+            ChangeNotifierProvider<AppLanguageNotifier>(create: (_) => AppLanguageNotifier()),
+          ],
+          child: MyApp(),
+        ),
+      );
+    });
   });
 }
 

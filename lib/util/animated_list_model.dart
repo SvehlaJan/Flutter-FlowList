@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flow_list/util/flow_logger.dart';
 import 'package:meta/meta.dart';
 
 class AnimatedListModel<E> {
@@ -24,10 +25,10 @@ class AnimatedListModel<E> {
           removeAt(indexOf(action));
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       // This happens after gallery is used to pick an image
       // The items in amimated list are reset and there is no way to check it
-      print("Removing item from animated list failed: $e");
+      FlowLogger.e(e, stackTrace);
       items.clear();
     }
 

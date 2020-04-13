@@ -48,7 +48,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
     model.record.secondEntry = _entry2ValueController.text;
     model.record.thirdEntry = _entry3ValueController.text;
 
-    model.updateFlowRecord().then((value) => Navigator.of(context).pop(true));
+    model.onUpdateClicked().then((value) => Navigator.of(context).pop(true));
   }
 
   void _onDateClicked(RecordsDetailViewModel model) {
@@ -91,7 +91,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
           FlatButton(
             child: Text(R.string(context).general_delete),
             onPressed: () {
-              model.deleteFlowRecord().then((value) => Navigator.of(context).pop());
+              model.onDeleteClicked().then((value) => Navigator.of(context).pop());
               Navigator.of(dialogContext).pop();
             },
           ),
@@ -99,10 +99,6 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
       ),
       barrierDismissible: true,
     );
-  }
-
-  void _onFavoriteClicked(int index, RecordsDetailViewModel model) {
-    model.onFavoriteEntrySelected(index);
   }
 
   List<AppBarAction> buildAppBarActions(BuildContext context, RecordsDetailViewModel model) {
@@ -203,7 +199,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         _entry1FocusNode,
         R.string(context).record_detail_entry_hint_1,
         model.record?.favoriteEntry == 0,
-        () => _onFavoriteClicked(0, model),
+        () => model.onFavoriteEntrySelected(0),
         () => FocusScope.of(context).requestFocus(_entry2FocusNode),
       ),
       _buildTextField(
@@ -212,7 +208,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         _entry2FocusNode,
         R.string(context).record_detail_entry_hint_2,
         model.record?.favoriteEntry == 1,
-        () => _onFavoriteClicked(1, model),
+        () => model.onFavoriteEntrySelected(1),
         () => FocusScope.of(context).requestFocus(_entry3FocusNode),
       ),
       _buildTextField(
@@ -221,14 +217,21 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         _entry3FocusNode,
         R.string(context).record_detail_entry_hint_3,
         model.record?.favoriteEntry == 2,
-        () => _onFavoriteClicked(2, model),
+        () => model.onFavoriteEntrySelected(2),
         () => _onFabClicked(model),
       )
     ];
   }
 
   Widget _buildTextField(
-      BuildContext context, TextEditingController controller, FocusNode focusNode, String hint, bool isFavorite, VoidCallback onFavoriteTap, VoidCallback onSubmitted) {
+    BuildContext context,
+    TextEditingController controller,
+    FocusNode focusNode,
+    String hint,
+    bool isFavorite,
+    VoidCallback onFavoriteTap,
+    VoidCallback onSubmitted,
+  ) {
 //    bool favoriteEntryEnabled = getIt<FeatureService>().getBool(FeatureService.FEATURE_FAVORITE_ENTRY);
     bool favoriteEntryEnabled = false;
     return Padding(
@@ -289,7 +292,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
         children: <Widget>[
           RawMaterialButton(
             elevation: 4.0,
-            onPressed: () => model.getImage(ImageSource.camera),
+            onPressed: () => model.onImagePickerClicked(ImageSource.camera),
             child: Icon(Icons.camera_alt),
             shape: CircleBorder(),
             fillColor: Theme.of(context).cardColor,
@@ -299,7 +302,7 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
           Spacer(),
           RawMaterialButton(
             elevation: 4.0,
-            onPressed: () => model.getImage(ImageSource.gallery),
+            onPressed: () => model.onImagePickerClicked(ImageSource.gallery),
             child: Icon(Icons.image),
             shape: CircleBorder(),
             fillColor: Theme.of(context).cardColor,

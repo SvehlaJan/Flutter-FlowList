@@ -160,7 +160,7 @@ class ChatViewModel extends BaseModel {
   }
 
   Future<void> uploadFile(File imageFile) async {
-    _flowRepository.uploadImage(imageFile, DateTime.now()).then((downloadUrl) {
+    _flowRepository.uploadImage(imageFile, DateTime.now(), currentUser.id).then((downloadUrl) {
       _record.imageUrl = downloadUrl;
       onMessageSent(UserMessage(downloadUrl, MessageType.IMAGE));
       setBusy(false);

@@ -4,14 +4,14 @@ import 'package:flutter_flow_list/models/flow_record.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 
 class FlowRecordTile extends StatelessWidget {
-//  final Animation<double> _animation;
   final FlowRecord _record;
   final VoidCallback _onTap;
 
-  FlowRecordTile(
-      //      this._animation,
-      this._record,
-      this._onTap);
+  const FlowRecordTile({
+    @required FlowRecord record,
+    @required VoidCallback onTap,
+  })  : _record = record,
+        _onTap = onTap;
 
   @override
   Widget build(BuildContext context) {

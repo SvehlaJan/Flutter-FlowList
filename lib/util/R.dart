@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_flow_list/generated/l10n.dart';
 import 'package:flutter_flow_list/locator.dart';
-import 'package:flutter_flow_list/util/navigation/navigation_service.dart';
+import 'package:flutter_flow_list/util/navigation_service.dart';
 
 class R {
   R._();

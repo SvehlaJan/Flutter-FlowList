@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flow_list/util/theme_notifier.dart';
 import 'package:flutter_flow_list/pages/settings/settings_view_model.dart';
-import 'package:flutter_flow_list/util/navigation/navigation_helper.dart';
+import 'package:flutter_flow_list/util/navigation_helper.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/ui/common_switch.dart';
