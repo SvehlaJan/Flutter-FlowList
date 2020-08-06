@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flow_list/util/theme_notifier.dart';
-import 'package:flutter_flow_list/pages/settings/settings_view_model.dart';
-import 'package:flutter_flow_list/util/navigation_helper.dart';
 import 'package:flutter_flow_list/pages/base/base_page_state.dart';
+import 'package:flutter_flow_list/pages/settings/settings_view_model.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/ui/common_switch.dart';
 import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/preferences.dart';
+import 'package:flutter_flow_list/util/theme_notifier.dart';
 import 'package:provider/provider.dart';
-import 'package:provider_architecture/viewmodel_provider.dart';
+import 'package:stacked/stacked.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -62,8 +61,8 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
 
   @override
   Widget build(BuildContext buildContext) {
-    return ViewModelProvider<SettingsViewModel>.withConsumer(
-        viewModel: SettingsViewModel(),
+    return ViewModelBuilder<SettingsViewModel>.reactive(
+        viewModelBuilder: () => SettingsViewModel(),
         onModelReady: (model) {},
         builder: (context, model, child) {
           if (model.busy == null) {

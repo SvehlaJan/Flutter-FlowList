@@ -6,7 +6,7 @@ import 'package:flutter_flow_list/pages/settings/login_view_model.dart';
 import 'package:flutter_flow_list/repositories/user_repository.dart';
 import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:provider_architecture/viewmodel_provider.dart';
+import 'package:stacked/stacked.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -33,8 +33,8 @@ class _LoginPageState extends BasePageState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelProvider<LoginViewModel>.withConsumer(
-        viewModel: LoginViewModel(),
+    return ViewModelBuilder<LoginViewModel>.reactive(
+        viewModelBuilder: () => LoginViewModel(),
         onModelReady: (model) {},
         builder: (context, model, child) {
           if (model.busy == null) {

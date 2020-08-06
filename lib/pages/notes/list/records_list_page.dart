@@ -7,7 +7,7 @@ import 'package:flutter_flow_list/pages/notes/list/records_list_view_model.dart'
 import 'package:flutter_flow_list/ui/flow_record_tile.dart';
 import 'package:flutter_flow_list/util/R.dart';
 import 'package:flutter_flow_list/util/constants.dart';
-import 'package:provider_architecture/provider_architecture.dart';
+import 'package:stacked/stacked.dart';
 
 class RecordsListPage extends StatefulWidget {
   @override
@@ -20,8 +20,8 @@ class _RecordsListPageState extends BasePageState<RecordsListPage> with TickerPr
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelProvider<RecordsListViewModel>.withConsumer(
-      viewModel: RecordsListViewModel(),
+    return ViewModelBuilder<RecordsListViewModel>.reactive(
+      viewModelBuilder: () => RecordsListViewModel(),
       onModelReady: (model) => model.listenToRecords(),
       builder: (context, model, child) {
         if (model.busy) {

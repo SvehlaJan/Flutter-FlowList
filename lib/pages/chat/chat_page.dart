@@ -7,12 +7,12 @@ import 'package:flutter_flow_list/pages/chat/chat_view_model.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_event.dart';
 import 'package:flutter_flow_list/pages/chat/flow_chat_state.dart';
 import 'package:flutter_flow_list/util/R.dart';
-import 'package:flutter_flow_list/util/secrets.dart';
 import 'package:flutter_flow_list/util/animated_list_model.dart';
 import 'package:flutter_flow_list/util/constants.dart';
+import 'package:flutter_flow_list/util/secrets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:giphy_picker/giphy_picker.dart';
-import 'package:provider_architecture/viewmodel_provider.dart';
+import 'package:stacked/stacked.dart';
 
 class FlowChatPage extends StatefulWidget {
   @override
@@ -44,9 +44,9 @@ class _FlowChatPageState extends BasePageState<FlowChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelProvider<ChatViewModel>.withConsumer(
-        viewModel: getIt<ChatViewModel>(),
-        reuseExisting: true,
+    return ViewModelBuilder<ChatViewModel>.reactive(
+        viewModelBuilder: () => getIt<ChatViewModel>(),
+        disposeViewModel: false,
         onModelReady: (model) {
           model.chatActionsStream.listen((chatActions) {
             _chatActionList.setItems(chatActions);
@@ -186,7 +186,7 @@ class ChatTypingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChatBubble(model, null, SpinKitThreeBounce(color: Theme.of(context).textTheme.body1.color, size: 24.0));
+    return ChatBubble(model, null, SpinKitThreeBounce(color: Theme.of(context).textTheme.bodyText2.color, size: 24.0));
   }
 }
 

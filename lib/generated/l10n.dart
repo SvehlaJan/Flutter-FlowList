@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -8,25 +9,31 @@ import 'intl/messages_all.dart';
 // Made by Localizely
 // **************************************************************************
 
+// ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
+
 class S {
   S();
-  
-  static const AppLocalizationDelegate delegate =
-    AppLocalizationDelegate();
+
+  static S current;
+
+  static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final String name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
-    final String localeName = Intl.canonicalizedLocale(name);
+    final name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
+    final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      return S();
+      S.current = S();
+
+      return S.current;
     });
-  } 
+  }
 
   static S of(BuildContext context) {
     return Localizations.of<S>(context, S);
   }
 
+  /// `Flow List`
   String get app_name {
     return Intl.message(
       'Flow List',
@@ -36,6 +43,7 @@ class S {
     );
   }
 
+  /// `Submit`
   String get general_submit {
     return Intl.message(
       'Submit',
@@ -45,6 +53,7 @@ class S {
     );
   }
 
+  /// `Add`
   String get general_add {
     return Intl.message(
       'Add',
@@ -54,6 +63,7 @@ class S {
     );
   }
 
+  /// `Delete`
   String get general_delete {
     return Intl.message(
       'Delete',
@@ -63,6 +73,7 @@ class S {
     );
   }
 
+  /// `Cancel`
   String get general_cancel {
     return Intl.message(
       'Cancel',
@@ -72,6 +83,7 @@ class S {
     );
   }
 
+  /// `Email`
   String get general_email {
     return Intl.message(
       'Email',
@@ -81,6 +93,7 @@ class S {
     );
   }
 
+  /// `Password`
   String get general_password {
     return Intl.message(
       'Password',
@@ -90,6 +103,7 @@ class S {
     );
   }
 
+  /// `This file is not an image`
   String get error_image_invalid {
     return Intl.message(
       'This file is not an image',
@@ -99,6 +113,7 @@ class S {
     );
   }
 
+  /// `Page not found :-(`
   String get error_page_not_found {
     return Intl.message(
       'Page not found :-(',
@@ -108,6 +123,7 @@ class S {
     );
   }
 
+  /// `Chat`
   String get chat_title {
     return Intl.message(
       'Chat',
@@ -117,6 +133,7 @@ class S {
     );
   }
 
+  /// `Type your message...`
   String get chat_input_hint {
     return Intl.message(
       'Type your message...',
@@ -126,6 +143,7 @@ class S {
     );
   }
 
+  /// `Settings`
   String get settings_title {
     return Intl.message(
       'Settings',
@@ -135,6 +153,7 @@ class S {
     );
   }
 
+  /// `Login`
   String get login_title {
     return Intl.message(
       'Login',
@@ -144,6 +163,7 @@ class S {
     );
   }
 
+  /// `Email can't be empty.`
   String get login_error_email_empty {
     return Intl.message(
       'Email can\'t be empty.',
@@ -153,6 +173,7 @@ class S {
     );
   }
 
+  /// `Email is not valid.`
   String get login_error_email_invalid {
     return Intl.message(
       'Email is not valid.',
@@ -162,6 +183,7 @@ class S {
     );
   }
 
+  /// `Password can't be empty.`
   String get login_error_password_empty {
     return Intl.message(
       'Password can\'t be empty.',
@@ -171,6 +193,7 @@ class S {
     );
   }
 
+  /// `Login`
   String get login_button_login {
     return Intl.message(
       'Login',
@@ -180,6 +203,7 @@ class S {
     );
   }
 
+  /// `Google login`
   String get login_button_google_login {
     return Intl.message(
       'Google login',
@@ -189,6 +213,7 @@ class S {
     );
   }
 
+  /// `Skip`
   String get login_button_skip {
     return Intl.message(
       'Skip',
@@ -198,6 +223,7 @@ class S {
     );
   }
 
+  /// `Flow notes`
   String get records_list_title {
     return Intl.message(
       'Flow notes',
@@ -207,6 +233,7 @@ class S {
     );
   }
 
+  /// `Welcome happy human!`
   String get records_list_empty_title {
     return Intl.message(
       'Welcome happy human!',
@@ -216,6 +243,7 @@ class S {
     );
   }
 
+  /// `Start with your first entry or link an account so that we can know each other better.`
   String get records_list_empty_body {
     return Intl.message(
       'Start with your first entry or link an account so that we can know each other better.',
@@ -225,6 +253,7 @@ class S {
     );
   }
 
+  /// `Let's chat`
   String get records_list_button_chat {
     return Intl.message(
       'Let\'s chat',
@@ -234,6 +263,7 @@ class S {
     );
   }
 
+  /// `Log in`
   String get records_list_button_login {
     return Intl.message(
       'Log in',
@@ -243,6 +273,7 @@ class S {
     );
   }
 
+  /// `Your day`
   String get record_detail_title {
     return Intl.message(
       'Your day',
@@ -252,6 +283,7 @@ class S {
     );
   }
 
+  /// `By`
   String get record_detail_by_prefix {
     return Intl.message(
       'By',
@@ -261,6 +293,7 @@ class S {
     );
   }
 
+  /// `Your first entry`
   String get record_detail_entry_hint_1 {
     return Intl.message(
       'Your first entry',
@@ -270,6 +303,7 @@ class S {
     );
   }
 
+  /// `Your second entry`
   String get record_detail_entry_hint_2 {
     return Intl.message(
       'Your second entry',
@@ -279,6 +313,7 @@ class S {
     );
   }
 
+  /// `Your third entry`
   String get record_detail_entry_hint_3 {
     return Intl.message(
       'Your third entry',
@@ -288,6 +323,7 @@ class S {
     );
   }
 
+  /// `Are you sure to delete this record?`
   String get record_detail_delete_dialog_title {
     return Intl.message(
       'Are you sure to delete this record?',
@@ -297,6 +333,7 @@ class S {
     );
   }
 
+  /// `Select date`
   String get record_detail_date_picker_title {
     return Intl.message(
       'Select date',
@@ -306,6 +343,7 @@ class S {
     );
   }
 
+  /// `Day score`
   String get record_detail_score_picker_title {
     return Intl.message(
       'Day score',
@@ -315,6 +353,7 @@ class S {
     );
   }
 
+  /// `Let's do it!`
   String get chat_action_lets_do_it {
     return Intl.message(
       'Let\'s do it!',
@@ -324,6 +363,7 @@ class S {
     );
   }
 
+  /// `Skip`
   String get chat_action_skip {
     return Intl.message(
       'Skip',
@@ -333,6 +373,7 @@ class S {
     );
   }
 
+  /// `Photo`
   String get chat_action_photo {
     return Intl.message(
       'Photo',
@@ -342,6 +383,7 @@ class S {
     );
   }
 
+  /// `Gallery`
   String get chat_action_gallery {
     return Intl.message(
       'Gallery',
@@ -351,6 +393,7 @@ class S {
     );
   }
 
+  /// `Gif`
   String get chat_action_gif {
     return Intl.message(
       'Gif',
@@ -360,6 +403,7 @@ class S {
     );
   }
 
+  /// `Welcome :-) Let's write down your best moments of the day.`
   String get chat_bot_welcome {
     return Intl.message(
       'Welcome :-) Let\'s write down your best moments of the day.',
@@ -369,6 +413,7 @@ class S {
     );
   }
 
+  /// `What was your best moment of the day?`
   String get chat_bot_entry_1 {
     return Intl.message(
       'What was your best moment of the day?',
@@ -378,6 +423,7 @@ class S {
     );
   }
 
+  /// `It sounds great! What was your second best moment?`
   String get chat_bot_entry_2 {
     return Intl.message(
       'It sounds great! What was your second best moment?',
@@ -387,6 +433,7 @@ class S {
     );
   }
 
+  /// `Lucky you! And what was the third best moment?`
   String get chat_bot_entry_3 {
     return Intl.message(
       'Lucky you! And what was the third best moment?',
@@ -396,6 +443,7 @@ class S {
     );
   }
 
+  /// `Great. Would you like to add some picture or photo to this day?`
   String get chat_bot_picture {
     return Intl.message(
       'Great. Would you like to add some picture or photo to this day?',
@@ -405,6 +453,7 @@ class S {
     );
   }
 
+  /// `You can also add some funny GIF :-)`
   String get chat_bot_gif {
     return Intl.message(
       'You can also add some funny GIF :-)',
@@ -414,6 +463,7 @@ class S {
     );
   }
 
+  /// `Great work! You can now see your notes history.`
   String get chat_bot_finished {
     return Intl.message(
       'Great work! You can now see your notes history.',
@@ -423,6 +473,7 @@ class S {
     );
   }
 
+  /// `bbb`
   String get aaa {
     return Intl.message(
       'bbb',
@@ -451,7 +502,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
 
   bool _isSupported(Locale locale) {
     if (locale != null) {
-      for (Locale supportedLocale in supportedLocales) {
+      for (var supportedLocale in supportedLocales) {
         if (supportedLocale.languageCode == locale.languageCode) {
           return true;
         }

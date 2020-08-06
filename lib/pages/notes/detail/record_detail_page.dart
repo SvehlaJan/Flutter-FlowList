@@ -8,7 +8,7 @@ import 'package:flutter_flow_list/util/constants.dart';
 import 'package:flutter_flow_list/util/date_picker_adapter.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider_architecture/viewmodel_provider.dart';
+import 'package:stacked/stacked.dart';
 
 class RecordDetailPage extends StatefulWidget {
   static const String ARG_DATE_STR = "RecordDetailPage.DATE_STR";
@@ -107,8 +107,8 @@ class _RecordDetailPageState extends BasePageState<RecordDetailPage> with Ticker
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelProvider<RecordsDetailViewModel>.withConsumer(
-        viewModel: RecordsDetailViewModel(),
+    return ViewModelBuilder<RecordsDetailViewModel>.reactive(
+        viewModelBuilder: () => RecordsDetailViewModel(),
         onModelReady: (model) {
           model.showSnackBarStream.listen((message) {
             Scaffold.of(context).showSnackBar(SnackBar(content: Text(message)));
